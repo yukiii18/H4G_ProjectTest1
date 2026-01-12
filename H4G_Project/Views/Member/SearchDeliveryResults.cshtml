@@ -1,0 +1,43 @@
+﻿@model List<Parcel>
+
+<table>
+    <tr>
+        <th>Parcel ID</th>
+        <th>Delivery Location</th>
+        <th>Delivery Status</th>
+    </tr>
+    @foreach (var result in Model)
+    {
+        <tr>
+            <td>@result.parcelId</td>
+            <td>@result.deliveryAddress</td>
+            @if (result.deliveryStatus == '0')
+            {
+                <td>Pending Delivery</td>
+            }
+            else if (result.deliveryStatus == '1')
+            {
+                <td>Delivery to destination</td>
+            }
+            else if (result.deliveryStatus == '2')
+            {
+                <td>delivery to airport</td>
+            }
+            else if (result.deliveryStatus == '3')
+            {
+                <td>delivery completed</td>
+            }
+            else if (result.deliveryStatus == '4')
+            {
+                <td>delivery failed</td>
+            }
+        </tr>
+    } @if (Model.Count == 0)
+    {
+        <tr>
+            <td colspan="3">No parcels found</td>
+        </tr>
+    }
+</table>
+
+

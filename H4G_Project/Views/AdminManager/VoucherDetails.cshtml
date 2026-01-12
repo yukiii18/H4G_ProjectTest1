@@ -1,0 +1,47 @@
+﻿@model H4G_Project.Models.CashVoucher
+@{
+    ViewBag.Title = "Voucher Details";
+    Layout = "~/Views/Shared/_AdminManager.cshtml";
+}
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow p-5 rounded-lg beautiful-card">
+        <h3 class="beautiful-font mb-4 text-center">CashVoucher Details</h3>
+        <hr />
+
+        <div class="form-group">
+            <label asp-for="cashVoucherID" class="control-label" hidden></label>
+            <input asp-for="cashVoucherID" class="form-control" hidden />
+            <span asp-validation-for="cashVoucherID" class="text-danger"></span>
+        </div>
+
+        <div class="text-center">
+            <span class="beautiful-text">
+                <span>Voucher Has Already Been Issued!</span>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="text-center my-3">
+    <a asp-action="ViewMemberBirthdayVoucher" class="btn btn-secondary btn-lg">Back to List</a>
+</div>
+
+<style>
+    .beautiful-font {
+        font-family: Montserrat, Arial, sans-serif;
+        font-size: 36px;
+        color: #333;
+    }
+
+    .beautiful-text {
+        font-family: Montserrat, Arial, sans-serif;
+        font-size: 24px;
+        color: #777;
+    }
+
+    .beautiful-card {
+        background-color: #f3f8ff; /* Use your preferred background color */
+        padding: 30px;
+    }
+</style>

@@ -1,0 +1,93 @@
+﻿@model H4G_Project.Models.CashVoucher
+@{
+    ViewBag.Title = "Confirm Issue Voucher";
+    Layout = "~/Views/Shared/_AdminManager.cshtml";
+}
+<div class="container">
+    <div class="card shadow p-4 rounded-lg">
+        <h4 class="beautiful-font">CashVoucher</h4>
+        <hr />
+
+        <div class="row">
+            <div class="col-md-6">
+                <form asp-action="ConfirmIssueVoucher">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group">
+                        <label asp-for="cashVoucherID" class="control-label" hidden></label>
+                        <input asp-for="cashVoucherID" class="form-control" hidden />
+                        <span asp-validation-for="cashVoucherID" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="staffID" class="control-label"></label>
+                        <input asp-for="staffID" class="form-control" readonly />
+                        <span asp-validation-for="staffID" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Amount" class="control-label"></label>
+                        <input asp-for="Amount" class="form-control" readonly />
+                        <span asp-validation-for="Amount" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="currency" class="control-label"></label>
+                        <input asp-for="currency" class="form-control" readonly />
+                        <span asp-validation-for="currency" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="issueingCode" class="control-label"></label>
+                        <input asp-for="issueingCode" class="form-control" readonly />
+                        <span asp-validation-for="issueingCode" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="receiverName" class="control-label"></label>
+                        <input asp-for="receiverName" class="form-control" readonly />
+                        <span asp-validation-for="receiverName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="receiverTelNo" class="control-label"></label>
+                        <input asp-for="receiverTelNo" class="form-control" readonly />
+                        <span asp-validation-for="receiverTelNo" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="dateTimeIssued" class="control-label"></label>
+                        <input asp-for="dateTimeIssued" class="form-control" readonly />
+                        <span asp-validation-for="dateTimeIssued" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="status" class="control-label" hidden></label>
+                        <input asp-for="status" class="form-control" hidden />
+                        <span asp-validation-for="status" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Issue" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center my-3">
+        <a asp-action="ViewMemberBirthdayVoucher" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
+
+<style>
+    .beautiful-font {
+        font-family: Montserrat, Arial, sans-serif;
+        font-size: 24px;
+        color: #333;
+    }
+
+    .card {
+        background-color: #f7f7f7; /* Use your preferred background color */
+    }
+</style>

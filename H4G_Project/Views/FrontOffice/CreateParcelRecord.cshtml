@@ -1,0 +1,260 @@
+﻿@model H4G_Project.Models.Parcel
+
+@{
+    ViewData["Title"] = "Create Parcel Record";
+    Layout = "~/Views/Shared/_FrontOffice.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Use Unicode character encoding - multi-language compatibility -->
+    <meta charset="utf-8">
+    <!-- Set the initial view zooming scale for mobile device -->
+    <meta name="viewport" content="width = device-width,
+ initial-scale = 1" />
+    <title>NP Courier Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <!-- Reference to customized styling for this website -->
+    <link rel="stylesheet" type="text/css" href="~/css/CreateParcelRecord.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<h1>Create Parcel Record</h1>
+
+<hr />
+<body>
+    <fieldset class="FormContent">
+        <div class="container">
+            <form asp-controller="FrontOffice" asp-action="CreateParcelRecord" method="post">
+                <div class="parcel-detail">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="input-container">
+                        <label asp-for="itemDescription" class="label"></label>
+                        <input asp-for="itemDescription" class="input" required />
+                        <span asp-validation-for="itemDescription" class="text-danger"></span>
+                    </div>
+                    <div class="input-container">
+                        <label asp-for="senderName" class="label"></label>
+                        <input asp-for="senderName" class="input" required />
+                        <span asp-validation-for="senderName" class="text-danger"></span>
+                    </div>
+                    <div class="input-container">
+                        <label asp-for="senderTelNo" class="label"></label>
+                        <input asp-for="senderTelNo" class="input" type="number" required />
+                        <span asp-validation-for="senderTelNo" class="text-danger"></span>
+                    </div>
+                    <div class="input-container">
+                        <label asp-for="receiverName" class="label"></label>
+                        <input asp-for="receiverName" class="input" required />
+                        <span asp-validation-for="receiverName" class="text-danger"></span>
+                    </div>
+                    <div class="input-container">
+                        <label asp-for="receiverTelNo" class="label"></label>
+                        <input asp-for="receiverTelNo" class="input" type="number" required />
+                        <span asp-validation-for="receiverTelNo" class="text-danger"></span>
+                    </div>
+                    <div class="input-container">
+                        <label asp-for="deliveryAddress" class="label"></label>
+                        <input asp-for="deliveryAddress" class="input" required />
+                        <span asp-validation-for="deliveryAddress" class="text-danger"></span>
+                    </div>
+                    <div class="input-container">
+                        <label asp-for="toCountry" class="label"></label>
+                        <select id="toCountry" asp-for="toCountry" asp-items="@ViewData["countries"] as List<SelectListItem>"
+                                class="form-control" required>
+                            <option value="Singapore" hidden></option>
+                        </select>
+                        <span asp-validation-for="toCountry" class="text-danger"></span>
+                    </div>
+                    <div class="input-container">
+                        <label asp-for="toCity" class="label"></label>
+                        <select id="toCity" asp-for="toCity" class="form-control" required>
+                            <option value="Singapore">Singapore</option>
+                        </select>
+                        <span asp-validation-for="toCity" class="text-danger"></span>
+                    </div>
+                    <div class="input-container">
+                        <label asp-for="parcelWeight" class="label"></label>
+                        <input asp-for="parcelWeight" class="input" required />
+                        <span asp-validation-for="parcelWeight" class="text-danger"></span>
+                    </div>
+                    <div class="input-container">
+                        <label asp-for="currency" class="label"></label>
+                        <input asp-for="currency" class="input" value="SGD" readonly />
+                        <span asp-validation-for="currency" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="create-parcel-btn">
+                    <input type="submit" value="Compute" id="createBtn" />
+                </div>
+            </form>
+        </div>
+
+
+    </fieldset>
+</body>
+</html>
+
+
+
+@if (Convert.ToBoolean(ViewData["ShowResult"]))
+{
+    <fieldset class="FormContent">
+        <div class="container">
+        <legend class="float-none">Result:</legend>
+        <form asp-controller="FrontOffice" asp-action="Add" method="post">
+                <div class="parcel-detail">
+                    <div class="input-container">
+                <label asp-for="itemDescription"
+                       class="col-form-label pt-0"></label>
+                <div class="col-sm-9">
+                    @Html.Display("itemDescription")
+                    <input asp-for="itemDescription" readonly hidden />
+                </div>
+            </div>
+                    <div class="input-container">
+                <label asp-for="senderName"
+                       class="col-form-label pt-0"></label>
+                <div class="col-sm-9">
+                    @Html.Display("senderName")
+                    <input asp-for="senderName" readonly hidden />
+                </div>
+            </div>
+                    <div class="input-container">
+                <label asp-for="senderTelNo"
+                       class="col-form-label pt-0"></label>
+                <div class="col-sm-9">
+                    @Html.Display("senderTelNo")
+                    <input asp-for="senderTelNo" readonly hidden />
+                </div>
+            </div>
+                    <div class="input-container">
+                <label asp-for="receiverName"
+                       class="col-form-label pt-0"></label>
+                <div class="col-sm-9">
+                    @Html.Display("receiverName")
+                    <input asp-for="receiverName" readonly hidden />
+                </div>
+            </div>
+                    <div class="input-container">
+                <label asp-for="receiverTelNo"
+                       class="col-form-label pt-0"></label>
+                <div class="col-sm-9">
+                    @Html.Display("receiverTelNo")
+                    <input asp-for="receiverTelNo" readonly hidden />
+                </div>
+            </div>
+                    <div class="input-container">
+                <label asp-for="deliveryAddress"
+                       class="col-form-label pt-0"></label>
+                <div class="col-sm-9">
+                    @Html.Display("deliveryAddress")
+                    <input asp-for="deliveryAddress" readonly hidden />
+                </div>
+            </div>
+                    <div class="input-container">
+                <label class="col-form-label pt-0" asp-for="targetDeliveryDate"></label>
+                <div class="col-sm-9">
+                    @Html.Display("targetDeliveryDate")
+                    <input asp-for="targetDeliveryDate" value="@Model.targetDeliveryDate" type="datetime" hidden />
+                </div>
+            </div>
+                    <div class="input-container">
+                <label class="col-form-label pt-0" asp-for="parcelWeight"></label>
+                <div class="col-sm-9">
+                    @Html.Display("parcelWeight") kg
+                    <input asp-for="parcelWeight" type="number" readonly hidden />
+                </div>
+            </div>
+                    <div class="input-container">
+                <label class="col-form-label pt-0">From City and Country: </label>
+                <div class="col-sm-9">
+                    Singapore, Singapore
+                </div>
+            </div>
+                    <div class="input-container">
+                <label class="col-form-label pt-0">To City and Country: </label>
+                <div class="col-sm-9">
+                    @ViewData["Destination"]
+                </div>
+            </div>
+                    <div class="input-container" hidden>
+                <label class="col-form-label pt-0">To City and Country: </label>
+                <div class="col-sm-9">
+                    <input asp-for="toCity" readonly />
+                </div>
+            </div>
+                    <div class="input-container" hidden>
+                <label class="col-form-label pt-0">To City and Country: </label>
+                <div class="col-sm-9">
+                    <input asp-for="toCountry" readonly />
+                </div>
+            </div>
+                    <div class="input-container">
+                <label class="col-form-label pt-0">Shipping Rate: </label>
+                <div class="col-sm-9">
+                    @Html.Display("ShippingRate")
+                </div>
+            </div>
+                    <div class="input-container">
+                <label class="col-form-label pt-0">Delivery Charge (Raw):</label>
+                <div class="col-sm-9">
+                    @ViewData["DeliveryChargeRaw"]
+                </div>
+            </div>
+                    <div class="input-container">
+                <label class="col-form-label pt-0">Delivery Charge (Rounded):</label>
+                <div class="col-sm-9">
+                    @ViewData["DeliveryChargeRounded"]
+                </div>
+            </div>
+                    <div class="input-container">
+                <label class="col-form-label pt-0">Delivery Charge (Final):</label>
+                <div class="col-sm-9">
+                    @ViewData["DeliveryChargeFinal"]
+                    <input asp-for="deliveryCharge" readonly hidden />
+                </div>
+            </div>
+                </div>
+
+            <div class="create-parcel-btn">
+                <input type="submit" value="Create" />
+            </div>
+        </form>
+        </div>
+    </fieldset>
+}
+
+
+
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Load cities dynamically based on the selected country
+        $(function () {
+           
+            $('#toCountry').change(function () {
+                var selectedCountry = $(this).val();
+                $.ajax({
+                    url: '@Url.Action("GetCities", "FrontOffice")',
+                    type: 'GET',
+                    data: { country: selectedCountry },
+                    success: function (response) {
+                        $('#toCity').empty();
+                        $.each(response, function (i, city) {
+                            $('#toCity').append($('<option></option>').val(city).html(city));
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>    
+}
+
+
+
+

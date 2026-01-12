@@ -1,0 +1,153 @@
+﻿@model IEnumerable<H4G_Project.Models.DeliveryManViewModel>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+@{
+    ViewData["Title"] = "StaffView";
+    Layout = "~/Views/Shared/_StationManager.cshtml";
+    Dictionary<char, string> statusvalue = ViewData["deliverystatus"] as Dictionary<char, string>;
+}
+<style>
+
+    body {
+        background-color: #f9f9f9;
+    }
+    .no-parcel-message {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px; 
+        font-weight: bold;
+    }
+    h2{
+        text-align:center;
+    }
+
+    .surround-background{
+        background-color:#eee;
+        padding-left:50px;
+        padding-right:50px;
+        padding-bottom:50px;
+        margin-top:30px;
+    }
+
+    .href {
+        text-decoration: none;
+        color: #551a8b;
+    }
+</style>
+<div class="surround-background">
+    <h2 style="padding-top:30px">Staffs</h2>
+
+
+    <table class="table table-striped">
+        <thead>
+            <tr class="table-secondary">
+
+                <th>ID</th>
+                <th>NAME</th>
+                <th>CONTACT</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+
+                    <td>
+                        @item.deliveryMan.staffID
+                    </td>
+                    <td>
+                        <i class="fa fa-user" aria-hidden="true"></i>
+
+                        @item.deliveryMan.staffName
+                    </td>
+                    <td>
+                        @item.deliveryMan.officeTelNo
+                    </td>
+                    <td>
+                        <a asp-area="" asp-action="StaffView" asp-route-id="@item.deliveryMan.staffID">
+                            View Assigned Parcels
+                        </a>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+
+    @if (ViewData["id"] != null)
+    {
+        foreach (var item in Model)
+        {
+            if ((int)ViewData["id"] == item.deliveryMan.staffID)
+            {
+                <h2>Assigned</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr class="table-secondary">
+                            <th>ID</th>
+                            <th>DESCRIPTION</th>
+                            <th>ADDRESS</th>
+                            <th>TO</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (item.parcelList.Count > 0)
+                        {
+                            @foreach (var parcel in item.parcelList)
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-area="" asp-action="IndividualParcel" asp-route-id="@parcel.parcelId">@parcel.parcelId</a>
+                                    </td>
+                                    <td>
+                                        @parcel.itemDescription
+                                    </td>
+                                    <td>
+                                        @parcel.deliveryAddress
+                                    </td>
+                                    <td>
+                                        @parcel.toCity,@parcel.toCountry
+                                    </td>
+                                    @{
+                                        if (parcel.deliveryStatus == '3')
+                                        {
+                                            <td class="td-status" style="color:forestgreen">
+
+                                                @statusvalue[(char)parcel.deliveryStatus]
+                                            </td>
+                                        }
+                                        else if (parcel.deliveryStatus == '4')
+                                        {
+                                            <td class="td-status" style="color:red">
+
+                                                @statusvalue[(char)parcel.deliveryStatus]
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="td-status" style="color:#E4D00A	">
+
+                                                @statusvalue[(char)parcel.deliveryStatus]
+                                            </td>
+                                        }
+                                    }
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                         
+                        }
+                    </tbody>
+                </table>
+            }
+        }
+    }
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" defer></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" defer></script>

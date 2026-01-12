@@ -1,0 +1,72 @@
+﻿@model H4G_Project.Models.ShippingRate
+@{
+    ViewBag.Title = "Edit Shipping Rate";
+    Layout = "~/Views/Shared/_AdminManager.cshtml";
+}
+
+<div class="container my-4">
+    <div class="card shadow rounded-lg border-0 animated fadeIn colorful-card">
+        <div class="card-body">
+            <h4 class="mb-4">Shipping Rate Details</h4>
+            <hr class="my-3">
+
+            <table class="table table-bordered table-striped">
+                <tbody>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.ShippingRateID)</th>
+                        <td>@Html.DisplayFor(model => model.ShippingRateID)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.fromCity)</th>
+                        <td>@Html.DisplayFor(model => model.fromCity)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.fromCountry)</th>
+                        <td>@Html.DisplayFor(model => model.fromCountry)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.toCity)</th>
+                        <td>@Html.DisplayFor(model => model.toCity)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.toCountry)</th>
+                        <td>@Html.DisplayFor(model => model.toCountry)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.shippingRate)</th>
+                        <td>@Html.DisplayFor(model => model.shippingRate)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.currency)</th>
+                        <td>@Html.DisplayFor(model => model.currency)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.transitTime)</th>
+                        <td>@Html.DisplayFor(model => model.transitTime)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.lastUpdatedBy)</th>
+                        <td>@Html.DisplayFor(model => model.lastUpdatedBy)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="text-center my-3">
+    
+    <a class="btn btn-secondary" asp-action="ViewShippingRate">Back to List</a>
+</div>
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+
+    <style>
+        /* Custom CSS for the colorful card */
+        .colorful-card {
+            background-color: #f3f8ff; /* Use your preferred background color */
+        }
+    </style>
+}

@@ -1,0 +1,187 @@
+﻿@model H4G_Project.Models.MainViewModel
+@{
+    ViewData["Title"] = "Reports";
+    Layout = "~/Views/Shared/_DeliveryMan.cshtml";
+    List<DeliveryFailure> list = ViewData["reports"] as List<DeliveryFailure>;
+}
+<style>
+    body {
+        background-color: #f9f9f9;
+    }
+    form{
+        margin-top:40px;
+        padding-left:30px;
+        paddingright:30px;
+        padding-bottom:30px;
+        padding-top:50px;
+        background-color:#eee;
+        border-radius:5px;
+    }
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+        .table th,
+        .table td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .table th {
+            background-color: #f2f2f2;
+        }
+
+        .table tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        .table td input[type="text"],
+        .table td select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+    .form-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    input[type="submit"] {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        align-items:center; 
+       
+    }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        input[type="submit"]:focus {
+            outline: none;
+        }
+
+    /* Hide hidden inputs from view */
+    input[type="hidden"] {
+        display: none;
+    }
+
+    .description {
+        width: 100%;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        resize: vertical; 
+    }
+    /* Style the select dropdown arrow */
+    select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        padding-right: 20px;
+        background: url('arrow-down.png') no-repeat right center;
+    }
+
+    .table th:nth-child(1) {
+        width: 75px;
+    }
+
+    .table th:nth-child(2) {
+        width: 150px;
+    }
+    .table th:nth-child(5) {
+       
+        width: 200px; 
+    }
+
+</style>
+
+<form asp-action ="PostReports" method = "post">
+    <h2 style="text-align:center">Reports</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr class="table-secondary">
+                <th>
+                    Parcel ID
+                </th>
+                    
+                <th>
+                    Date
+                </th>
+                <th>
+                    Description
+                </th>
+                <th>
+                    Follow-Up
+                </th>
+                    
+                <th>
+                    Type
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < list.Count; i++){
+
+                if ((int)list[i].reportID != 0)
+                {
+                    <tr>
+                        <!-- Display existing data -->
+                        <td>
+                            <a asp-area="" asp-action="IndividualParcel" asp-route-id="@list[i].parcelID" class="table-display href">@list[i].parcelID</a>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => list[i].dateCreated)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => list[i].description)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => list[i].followUpAction)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => list[i].failureType)
+                        </td>
+
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>
+                            <a asp-area="" asp-action="IndividualParcel" asp-route-id="@list[i].parcelID" class="table-display href">@list[i].parcelID</a >
+                            <input type="hidden" asp-for="@Model.Reports[i].id" value = "@list[i].parcelID" />
+
+                        </td>
+                        <td>@DateTime.Now.ToString("dd-MMM-yyyy")</td>
+                        <td>
+                            <input asp-for="@Model.Reports[i].description" type="text">
+                        </td>
+                        <td> TBA </td>
+                        <td>
+                            <select asp-for="@Model.Reports[i].details">
+                                <option value="0">--Select an Option--</option>
+                                <option value="1">Receiver Not Found</option>
+                                <option value="2">Wrong Delivery Address</option>
+                                <option value="3">Parcel Damaged</option>
+                                <option value="4">Other</option>
+                            </select>
+                        </td>
+                    </tr>
+                }
+            }
+            
+        </tbody>
+    </table>
+    <div class="form-container">
+        <input type="submit" value="Submit Changes" />
+    </div>
+</form>

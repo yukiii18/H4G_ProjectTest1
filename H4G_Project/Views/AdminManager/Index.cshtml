@@ -1,0 +1,38 @@
+﻿@{
+    ViewData["Title"] = "Admin Manager - Homepage";
+    Layout = "~/Views/Shared/_AdminManager.cshtml";
+}
+<div class="container">
+    <div class="jumbotron text-center" style="background-image: url('/images/about_pic4.png'); background-size: cover; background-position: top;">
+        <div class="jumbotron text-center" style="background-image: url('/images/about_pic4.png'); background-size: cover; background-position: top;">
+            <h1  font-weight: bold;">Welcome, Admin Manager!</h1>
+            <p class="lead" style="color: black; ">Manage and monitor the delivery system with ease.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">Shipping Rates</h3>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Manage shipping rates and transit times.</p>
+                    <a href="@Url.Action("ViewShippingRate", "AdminManager")" class="btn btn-primary">View Shipping Rate</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">Cash Vouchers</h3>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">View and issue cash vouchers on birthdays.</p>
+                    <a href="@Url.Action("ViewMemberBirthdayVoucher", "AdminManager")" class="btn btn-primary">View Birthday Voucher</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

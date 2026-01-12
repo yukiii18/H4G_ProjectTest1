@@ -1,0 +1,117 @@
+﻿@{
+  ViewData["Title"] = "Member";
+}
+
+@model Customer
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+      type="text/css"
+    />
+    <link rel="stylesheet" href="theme.css" type="text/css" />
+    <link rel="stylesheet" href="static/theme.css" />
+  </head>
+
+  <body>
+    <nav 
+      style="bg-color: #000000;">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+        <div style="display: flex; align-items: center;">
+          <a class="navbar-brand" href="#">
+          <i class="fa d-inline fa-bomb fa-lg"></i>
+          <b
+            ><b
+              ><i><u> My Courier Service </u></i></b
+            ></b
+          >
+        </a>
+        </div>
+        <div style="display: flex; align-items: center;">
+          <a href="/" style="color: black; margin-right: 80px;">Outstanding Deliveries</a>
+          <a href="/Delivery/TrackMyItems" style="color: black; margin-right: 80px;">View Deliveries</a>
+          <a href="/" style="color: black; margin-right: 80px;">Outstanding Faliure Reports</a>
+          <a href="/" style="color: black; margin-right: 80px;">View failure reports</a>
+          <a href="/Logout" style="color: black; margin-right: 80px;"><i class="fa d-inline fa-sign-out"></i></a>
+        </div>
+        </div>
+    </nav>
+    <div class="py-5 text-center align-items-center d-flex" style="">
+      <div class="container py-5">
+        <div class="row">
+            View Deliveries
+        </div>
+        <br>
+        <div class="row">
+            <form id="searchForm" class="form-control">
+              <input type="text" placeholder="Search For A Parcels" name="query" id="queryInput" class="form-control">
+
+              <button type="submit" class="btn btn-primary" style="margin-top: 20px;">Search</button>
+            </form>
+          
+          </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsive">
+                <div id="searchResults"></div>
+            </div>
+          </div>
+        </div>
+
+        <button
+          class="btn btn-primary"
+          type="button"
+          style="margin-top: 20px;"
+        >
+          Exit
+        </button>
+      </div>
+    </div>
+  </body>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      $(document).ready(function() {
+        $('#searchForm').submit(function(e) {
+          e.preventDefault(); // Prevent the form from submitting normally
+
+          var query = $('#queryInput').val(); // Get the search query from the input field
+
+          // Send an AJAX request to the server
+          $.ajax({
+            url: '/Member/ViewDelivery', // Replace with the actual URL of your search action method
+            type: 'GET',
+            data: { query: query },
+            success: function(data) {
+              // Update the search results section with the retrieved data
+              $('#searchResults').html(data);
+            },
+            error: function() {
+              // Handle any errors
+              console.log('An error occurred during the search request.');
+            }
+          });
+        });
+      });
+    </script>
+</html>
+

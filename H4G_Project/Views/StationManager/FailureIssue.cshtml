@@ -1,0 +1,107 @@
+﻿@model IEnumerable<H4G_Project.Models.DeliveryFailure>
+@{
+    ViewData["Title"] = "Issue Cash Voucher";
+    Layout = "~/Views/Shared/_StationManager.cshtml";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>My Website</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .table-card {
+            border: none;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+
+            .table-card:hover {
+                transform: translateY(-2px);
+            }
+
+            .table-card .card-body {
+                padding: 15px;
+            }
+
+            .table-card .card-title {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+
+        /* Custom CSS styles for the table rows */
+        .table tbody tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        /* Custom CSS for spacing between buttons */
+        .btn-spacing {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="card table-card">
+            <div class="card-body">
+                <h5 class="card-title">Reports Table</h5>
+                <table class="table">
+                    <!-- Table header content here -->
+                    <thead>
+                        <tr>
+                            <th>Report ID</th>
+                            <th>Parcel ID</th>
+                            <th>Delivery Man ID</th>
+                            <th>Failure Type</th>
+                            <th>Description</th>
+                            <th>Station Manager ID</th>
+                            <th>Follow-up Action</th>
+                            <th>Date Created</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <!-- Table row content here -->
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.reportID)</td>
+                                <td>@Html.DisplayFor(modelItem => item.parcelID)</td>
+                                <td>@Html.DisplayFor(modelItem => item.deliveryManID)</td>
+                                <td>@Html.DisplayFor(modelItem => item.failureType)</td>
+                                <td>@Html.DisplayFor(modelItem => item.description)</td>
+                                <td>@Html.DisplayFor(modelItem => item.stationMgrID)</td>
+                                <td>@Html.DisplayFor(modelItem => item.followUpAction)</td>
+                                <td>@Html.DisplayFor(modelItem => item.dateCreated)</td>
+                                <td>
+                                    <!-- Add spacing class to separate the buttons -->
+                                    <div class="btn-spacing">
+                                        <a class="btn btn-primary" asp-controller="StationManager" asp-action="Confirmation" asp-route-id="@item.reportID">
+                                            <i class="fas fa-edit"></i> Issue
+                                        </a>
+                                    </div>
+                                    <br>
+                                    <div class="btn-spacing">
+                                        <a class="btn btn-primary" asp-controller="StationManager" asp-action="EditFailureDesc" asp-route-id="@item.reportID">
+                                            <i class="fas fa-edit"></i> Update Description
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+﻿@model IEnumerable<H4G_Project.Models.CashVoucher>
+@{
+    ViewData["Title"] = "Cash Voucher Details";
+    Layout = "~/Views/Shared/_FrontOffice.cshtml";
+}
+<style>
+    .search-bar-container {
+        margin-bottom: 10px
+    }
+
+    .search-form {
+        display: flex;
+        align-items: center
+    }
+
+    .search-input {
+        margin-right: 5px
+    }
+
+    .search-btn {
+        white-space: nowrap
+    }</style>
+<div class="search-bar-container d-flex justify-content-between">
+    <form class="search-form" role="search" asp-controller="FrontOffice" asp-action="Searcher">
+        <div class="input-group">
+            <input class="form-control search-input" type="search" placeholder="Name" aria-label="Search" name="name">
+        </div>
+        <div class="input-group">
+            <input class="form-control search-input" type="search" placeholder="Telephone Number" aria-label="Search" name="telNo">
+        </div>
+        <button class="btn btn-outline-success search-btn" type="submit">Search</button>
+    </form>
+</div>
+<div class="container mt-4">
+    
+    <div class="table-responsive">
+        @if ((bool)ViewData["Result"])
+        {
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.cashVoucherID)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.staffID)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Amount)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.currency)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.issueingCode)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.receiverName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.receiverTelNo)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.dateTimeIssued)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.status)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.cashVoucherID)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.staffID)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Amount)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.currency)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.issueingCode)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.receiverName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.receiverTelNo)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.dateTimeIssued)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.status)
+                            </td>
+                            <td>
+                                <a class="btn btn-primary" asp-controller="FrontOffice" asp-action="EditVoucherStatus" asp-route-id="@item.cashVoucherID"><i class="fas fa-edit"></i> Status</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <h4 class="text-center">No Results Found</h4>
+        }
+    </div>
+</div>
+

@@ -1,0 +1,45 @@
+﻿@model List<Parcel>
+
+@if (Model != null && Model.Count > 0)
+{
+    @foreach (var result in Model)
+    {
+        <div style="display:flex; flex-direction: row; border: 3px solid blue; margin-top: 10px; margin-bottom: 10px;" onclick="routeToParcelItem(@result.parcelId)">
+            <div style="width: 50%">
+                <div>@result.parcelId</div>
+                @if (result.deliveryStatus == '0')
+                {
+                    <div>Pending Delivery</div>
+                }
+                else if (result.deliveryStatus == '1')
+                {
+                    <div>Delivery to destination</div>
+                }
+                else if (result.deliveryStatus == '2')
+                {
+                    <div>delivery to airport</div>
+                }
+                else if (result.deliveryStatus == '3')
+                {
+                    <div>delivery completed</div>
+                }
+                else if (result.deliveryStatus == '4')
+                {
+                    <div>delivery failed</div>
+                }
+            </div>
+            <div style="width: 50%">@result.targetDeliveryDate</div>
+        </div>
+
+    }
+}
+else
+{
+    <p>No results found.</p>
+}
+
+<script>
+    function routeToParcelItem(parcelId) {
+        window.location.href = "/Member/ParcelItem/" + parcelId;
+    }
+</script>

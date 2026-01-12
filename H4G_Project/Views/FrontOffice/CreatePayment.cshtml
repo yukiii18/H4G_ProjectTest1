@@ -1,0 +1,156 @@
+﻿@model H4G_Project.Models.PaymentTransaction
+
+@{
+    ViewData["Title"] = "Create Payment";
+    Layout = "~/Views/Shared/_FrontOffice.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+
+    <!--
+      - custom css link
+    -->
+    <link rel="stylesheet" href="~/css/site.css">
+    <link rel="stylesheet" href="~/css/payment.css">
+
+    <!--
+      - google font link
+    -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+3:200,300,regular,500,600,700,800,900,200italic,300italic,italic,500italic,600italic,700italic,800italic,900italic"
+          rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/621175abe2.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <!--
+      - main container
+    -->
+
+    <main class="container">
+
+        <h1 class="heading">
+            Create Payment
+        </h1>
+
+        <div class="item-flex">
+
+            <!--
+             - checkout section
+            -->
+            <section class="checkout">
+                <h2 class="section-heading">Payment Details</h2>
+                <form asp-controller="FrontOffice" asp-action="CreatePayment" method="post">
+                    <div class="parcel-detail">
+                        <div class="payment-method">
+                            <div>
+                                <label asp-for="tranType"
+                                       class="col-form-label"></label>
+                                @foreach (var item in ViewData["tranType"] as List<string>)
+                                {
+                                    <div class="form-check form-check-inline">
+                                        <input asp-for="tranType" type="radio"
+                                           value="@item" class="form-check-input" checked="@(item == "CASH" ? "checked" : null)" />
+                                        <label asp-for="tranType" class="form-check-label">
+                                            @item
+                                        </label>
+                                    </div>
+                                }
+                                <span asp-validation-for="tranType" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="input-container"></div>
+                        <div class="input-container">
+                            <label asp-for="parcelID" class="label"></label>
+                            <input asp-for="parcelID" class="input" value="@ViewData["ParcelId"]" readonly />
+                            <span asp-validation-for="parcelID" class="text-danger"></span>
+                        </div>
+                        <div class="input-container">
+                            <label asp-for="currency" class="label"></label>
+                            <input asp-for="currency" class="input" value="SGD" readonly />
+                            <span asp-validation-for="currency" class="text-danger"></span>
+                        </div>
+                        <div class="input-container">
+                            <label asp-for="amtTran" class="label"></label>
+                            <input asp-for="amtTran" class="input" required/>
+                            <span asp-validation-for="amtTran" class="text-danger"></span>
+                        </div>
+                        <div class="input-container">
+                            <label asp-for="tranDate" class="label"></label>
+                            <input asp-for="tranDate" class="input" value="@ViewData["Date"]"  type="datetime" readonly/>
+                            <span asp-validation-for="tranDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <button id="makePaymentBtn" class="btn btn-primary">
+                        <b>Create</b>
+                    </button>
+                </form>
+
+            </section>
+
+
+            <section class="cart">
+
+                <div class="cart-item-box">
+
+                    <h2 class="section-heading">Amount Payable</h2>
+
+                    <div class="wrapper">
+
+                        <div class="amount">
+
+                            <div class="subtotal">
+                                <span>Paid</span> <span>$ <span id="paid">@ViewData["Paid"]</span></span>
+                            </div>
+
+                            <div class="total">
+                                <span>Left</span> <span>$ <span id="left">@ViewData["Left"]</span></span>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>
+
+
+<script>
+    document.getElementById("makePaymentBtn").addEventListener("click", function (event) {
+        var amtInput = document.getElementById("amtTran");
+        var leftAmount = parseFloat(document.getElementById("left").textContent);
+        var paymentAmount = parseFloat(amtInput.value);
+
+        if (isNaN(paymentAmount) || paymentAmount <= 0) {
+            alert("Please enter a valid payment amount.");
+            event.preventDefault();
+            return;
+        }
+
+        if (paymentAmount > leftAmount) {
+            alert("Payment amount cannot exceed the left amount.");
+            event.preventDefault();
+            return;
+        }
+    });
+</script>
+
+
+
+
+

@@ -1,0 +1,135 @@
+﻿@{
+    ViewData["Title"] = "Member";
+    var successMessage = TempData["SuccessMessage"] as string;
+    Layout = "~/Views/Shared/_Member.cshtml";
+    string message = TempData["Message"]?.ToString();
+}
+
+@model Customer
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+          type="text/css" />
+    <link rel="stylesheet" href="theme.css" type="text/css" />
+    <link rel="stylesheet" href="static/theme.css" />
+</head>
+
+<body>
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="container text-center mt-4">
+            <div class="alert alert-danger">
+                <span>@message</span>
+            </div>
+        </div>
+    }
+    <div class="py-5 text-center align-items-center d-flex" style="">
+        <div class="container py-5">
+            <div class="row">
+                Welcome @Model.Member.name, you have @Model?.Inboxes?.Count pending notifications
+            </div>
+            <br>
+            <br>
+            <br>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <h2>My Items</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Item Description</th>
+                                    <th>Sender Name</th>
+                                    <th>Sender Tel No</th>
+                                    <th>Receiver Name</th>
+                                    <th>Receiver Tel No</th>
+                                    <th>Delivery Address</th>
+                                    <th>From City</th>
+                                    <th>From Country</th>
+                                    <th>To City</th>
+                                    <th>To Country</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var parcel in Model.Parcels)
+                                {
+                                    <tr>
+                                        <td>@parcel.itemDescription</td>
+                                        <td>@parcel.senderName</td>
+                                        <td>@parcel.senderTelNo</td>
+                                        <td>@parcel.receiverName</td>
+                                        <td>@parcel.receiverTelNo</td>
+                                        <td>@parcel.deliveryAddress</td>
+                                        <td>@parcel.fromCity</td>
+                                        <td>@parcel.fromCountry</td>
+                                        <td>@parcel.toCity</td>
+                                        <td>@parcel.toCountry</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <br>
+                        <br>
+                        <br>
+                        <h2>My Vouchers</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Amount</th>
+                                    <th>Currency</th>
+                                    <th>Receiver Name</th>
+                                    <th>Receiver Tel No</th>
+                                    <th>Date Time Issued</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Vouchers != null || Model.Vouchers.Count > 0)
+                                {
+                                    foreach (var voucher in Model.Vouchers)
+                                    {
+                                        <tr>
+                                            <td>@voucher.Amount</td>
+                                            <td>@voucher.currency</td>
+                                            <td>@voucher.receiverName</td>
+                                            <td>@voucher.receiverTelNo</td>
+                                            <td>@voucher.dateTimeIssued</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5">No vouchers found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+<!-- Add the SweetAlert CSS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.min.css" rel="stylesheet" />
+
+<!-- Add the SweetAlert JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.all.min.js"></script>
+
+</html>
+

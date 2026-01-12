@@ -1,0 +1,87 @@
+﻿@model IEnumerable<H4G_Project.Models.ShippingRate>
+@{
+    ViewBag.Title = "Shipping Rate";
+    Layout = "~/Views/Shared/_AdminManager.cshtml";
+}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <h4 class="card-title">Shipping Rates</h4>
+        <hr />
+
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ShippingRateID)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.fromCity)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.fromCountry)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.toCity)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.toCountry)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.shippingRate)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.currency)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.transitTime)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.lastUpdatedBy)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ShippingRateID)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.fromCity)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.fromCountry)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.toCity)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.toCountry)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.shippingRate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.currency)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.transitTime)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.lastUpdatedBy)
+                            </td>
+                            <td>
+                                <a class="btn btn-primary" asp-route-id="@item.ShippingRateID" asp-controller="AdminManager" asp-action="EditShippingRate"><i class="fas fa-edit"></i> Edit</a>
+                                <a class="btn btn-danger" asp-route-id="@item.ShippingRateID" asp-controller="AdminManager" asp-action="DeleteShippingRate"><i class="fas fa-trash"></i> Delete</a>
+                                <a class="btn btn-info" asp-route-id="@item.ShippingRateID" asp-controller="AdminManager" asp-action="DetailsShippingRate"><i class="fas fa-info-circle"></i> Details</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

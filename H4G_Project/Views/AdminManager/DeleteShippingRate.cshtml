@@ -1,0 +1,75 @@
+﻿@model H4G_Project.Models.ShippingRate
+
+@{
+    ViewBag.Title = "Delete Shipping Rate";
+    Layout = "~/Views/Shared/_AdminManager.cshtml";
+}
+
+<div class="container">
+    <div class="card shadow rounded-lg border-0 animated fadeIn colorful-card">
+        <div class="card-body">
+            <h3 class="mb-4">Are you sure you want to delete this?</h3>
+            <hr />
+            <h4>Shipping Rate Details</h4>
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th>Shipping Rate ID</th>
+                        <td>@Html.DisplayFor(model => model.ShippingRateID)</td>
+                    </tr>
+                    <tr>
+                        <th>From City</th>
+                        <td>@Html.DisplayFor(model => model.fromCity)</td>
+                    </tr>
+                    <tr>
+                        <th>From Country</th>
+                        <td>@Html.DisplayFor(model => model.fromCountry)</td>
+                    </tr>
+                    <tr>
+                        <th>To City</th>
+                        <td>@Html.DisplayFor(model => model.toCity)</td>
+                    </tr>
+                    <tr>
+                        <th>To Country</th>
+                        <td>@Html.DisplayFor(model => model.toCountry)</td>
+                    </tr>
+                    <tr>
+                        <th>Shipping Rate</th>
+                        <td>@Html.DisplayFor(model => model.shippingRate)</td>
+                    </tr>
+                    <tr>
+                        <th>Currency</th>
+                        <td>@Html.DisplayFor(model => model.currency)</td>
+                    </tr>
+                    <tr>
+                        <th>Transit Time</th>
+                        <td>@Html.DisplayFor(model => model.transitTime)</td>
+                    </tr>
+                    <tr>
+                        <th>Last Updated By</th>
+                        <td>@Html.DisplayFor(model => model.lastUpdatedBy)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="text-center">
+                <form asp-action="DeleteShippingRate">
+                    <input type="hidden" asp-for="ShippingRateID" />
+                    <input type="submit" value="Delete" class="btn btn-danger" /> |
+                    <a asp-action="ViewShippingRate" class="btn btn-secondary">Back to List</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <style>
+        /* Custom CSS for the colorful card */
+        .colorful-card {
+            background-color: lightcyan; /* Use your preferred background color */
+        }
+    </style>
+}

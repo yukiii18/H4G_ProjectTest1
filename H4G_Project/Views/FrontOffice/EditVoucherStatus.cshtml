@@ -1,0 +1,123 @@
+﻿@model H4G_Project.Models.CashVoucher
+@{
+    ViewData["Title"] = " Edit Cash Voucher Details";
+    Layout = "~/Views/Shared/_FrontOffice.cshtml";
+}
+<div class="container">
+    <div class="card shadow p-4 rounded-lg">
+        <h4 class="beautiful-font">CashVoucher</h4>
+        <hr />
+
+        <div class="row">
+            <div class="col-md-6">
+                <form asp-action="EditVoucherStatus">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group">
+                        <label asp-for="cashVoucherID" class="control-label">Cash Voucher ID</label>
+                        <input asp-for="cashVoucherID" class="form-control" readonly />
+                        <span asp-validation-for="cashVoucherID" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="staffID" class="control-label">Staff ID</label>
+                        <input asp-for="staffID" class="form-control" readonly />
+                        <span asp-validation-for="staffID" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Amount" class="control-label">Amount</label>
+                        <input asp-for="Amount" class="form-control" readonly />
+                        <span asp-validation-for="Amount" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="currency" class="control-label">Currency</label>
+                        <input asp-for="currency" class="form-control" readonly />
+                        <span asp-validation-for="currency" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="issueingCode" class="control-label">Issueing Code</label>
+                        <input asp-for="issueingCode" class="form-control" readonly />
+                        <span asp-validation-for="issueingCode" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="receiverName" class="control-label">Receiver Name</label>
+                        <input asp-for="receiverName" class="form-control" readonly />
+                        <span asp-validation-for="receiverName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="receiverTelNo" class="control-label">Receiver Tel. No</label>
+                        <input asp-for="receiverTelNo" class="form-control" readonly />
+                        <span asp-validation-for="receiverTelNo" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="dateTimeIssued" class="control-label">Date/Time Issued</label>
+                        <input asp-for="dateTimeIssued" class="form-control"/>
+                        <span asp-validation-for="dateTimeIssued" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="status" class="control-label">Status</label>
+                        <select asp-for="status" asp-items="@ViewData["voucherList"] as List<SelectListItem>" class="form-control"></select>
+                        <span asp-validation-for="status" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Save" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center my-3">
+        <a asp-action="CashVoucherDetails" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
+
+<style>
+    .beautiful-font {
+        font-family: Montserrat, Arial, sans-serif;
+        font-size: 30px;
+        color: #333;
+    }
+
+    .card {
+        background-color: #f7f7f7;
+        border-radius: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    select {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 16px;
+        width: 100%;
+    }
+
+    input[type="submit"] {
+        width: 100%;
+        padding: 12px;
+        font-size: 18px;
+    }
+
+    .btn-secondary {
+        font-size: 18px;
+        padding: 10px 20px;
+    }
+</style>
+

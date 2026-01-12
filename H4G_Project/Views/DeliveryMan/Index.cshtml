@@ -1,0 +1,52 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_DeliveryMan.cshtml";
+}
+
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        background-color: #eee;
+    }
+
+    h1 {
+        margin: 0;
+    }
+</style>
+<div class="jumbotron text-center" style=" background-size: cover; background-position: top;">
+    <div class="jumbotron text-center" style=" background-image: url('/images/DeliveryManHome.png'); border-radius: 5px; opacity: 0.8;">
+        <h1 font-weight: bold;" style="color:black">Welcome, Delivery Man!</h1>
+        <!--<p class="lead" style="color: black; ">Manage and monitor the delivery system with ease.</p>-->
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">Shipping Rates</h3>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Manage Deliveries and View Parcel Records</p>
+                    <a href="@Url.Action("Deliveries", "DeliveryMan")" class="btn btn-primary">View Deliveries</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">Cash Vouchers</h3>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">View and Submit Failed Parcels</p>
+                    <a href="@Url.Action("Reports", "DeliveryMan")" class="btn btn-primary">View Reports</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
