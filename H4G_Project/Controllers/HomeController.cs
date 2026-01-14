@@ -12,10 +12,9 @@ namespace H4G_Project.Controllers
 {
     public class HomeController : Controller
     {
-        private MemberDAL memberContext = new MemberDAL();
+        private UserDAL userContext = new UserDAL();
         private StaffDAL staffContext = new StaffDAL();
-        private countriesDAL countriesContext = new countriesDAL();
-        private InternationalCallingCodeDAL internationalCallingCodeContext = new InternationalCallingCodeDAL();
+
         // GET: HomeController
         // Login page (no time for an actual homepage)
         public ActionResult Index()
@@ -23,10 +22,16 @@ namespace H4G_Project.Controllers
             return View();
         }
 
-        
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+
         // check two different forms to see if there are any values in the text field.
         // Run login function to check the db for confirmation on the user for the form with details
         // go to respective pages when login is a success and set storage details
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Login(IFormCollection formData)
@@ -35,13 +40,13 @@ namespace H4G_Project.Controllers
             string staffemail = formData["stafflogin"];
             string staffpassword = formData["staffpassword"];
 
-            if (memberContext.Login(memberemail) != null)
+            if (userContext.GetUserByEmail(memberemail) != null)
             {
-                HttpContext.Session.SetString("email",memberemail);
-                //HttpContext.Session.SetString("RoleObject", JsonConvert.SerializeObject(memberContext.Login(memberemail, memberpassword)));
-                return RedirectToAction("Index", "Member");
+                HttpContext.Session.SetString("email", memberemail);
+                //HttpContext.Session.SetString("RoleObject", JsonConvert.SerializeObject(userContext.Login(memberemail, memberpassword)));
+                return RedirectToAction("Index", "User");
             }
-            if (staffContext.Login(staffemail, staffpassword) != null)
+            /*if (staffContext.Login(staffemail, staffpassword) != null)
             {
                 Staff staff = staffContext.Login(staffemail, staffpassword);
                 //HttpContext.Session.SetString("RoleObject", JsonConvert.SerializeObject(staff));
@@ -64,7 +69,7 @@ namespace H4G_Project.Controllers
                 }
                 return NotFound("You currently do not have a role, please confirm with the admin manager your role");
 
-            }
+            }*/
 
             TempData["MemberMessage"] = "Invalid member login details";
             TempData["StaffMessage"] = "Invalid staff login details";
@@ -74,46 +79,6 @@ namespace H4G_Project.Controllers
         // GET: HomeController/Create
         // Create a member page
         // Additional dropdown list details are added for country and cities (special feature)
-        public ActionResult Create()
-        {
-            List<SelectListItem> countryDropdown = countriesContext.getCountries();
-            List<SelectListItem> cityDropdown = new List<SelectListItem>();
-            countryDropdown.Add(new SelectListItem { Text = "Select an option", Value = null, Selected = true, Disabled = true });
-            cityDropdown.Add(new SelectListItem { Text = "Select a country", Value = null, Selected = true, Disabled = true });
-            ViewData["Countries"] = countryDropdown;
-            ViewData["Cities"] = cityDropdown;
-            return View();
-        }
-        // check if the input memebr details are valid in the member model and create the user and redirect to the login page.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        // POST: HomeController/Create
-        
-        public ActionResult Create(Member member)
-        {
-            member.telNo = "+" + internationalCallingCodeContext.GetCode(member.country) + member.telNo;
-            if (ModelState.IsValid)
-            {
-                member.memberID = memberContext.CreateUser(member);
-                TempData["UserCreationSuccessful"] = true; // login page
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
 
-                return RedirectToAction("Create", "Home", member);
-            }
-        }
-
-        public ActionResult About()
-        {
-            return View();
-        }
-
-        public ActionResult ContactUs()
-        {
-            List<Staff> staffList = staffContext.GetAllStaff();
-            return View(staffList);
-        }
     }
 }

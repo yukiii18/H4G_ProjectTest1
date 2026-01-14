@@ -4,39 +4,20 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>H4G_Project</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Views\Admin Manager\**" />
-    <Compile Remove="Views\Customer\**" />
-    <Compile Remove="Views\Delivery Man\**" />
-    <Compile Remove="Views\Front Office\**" />
-    <Compile Remove="Views\Station Manager\**" />
-    <Content Remove="Views\Admin Manager\**" />
-    <Content Remove="Views\Customer\**" />
-    <Content Remove="Views\Delivery Man\**" />
-    <Content Remove="Views\Front Office\**" />
-    <Content Remove="Views\Station Manager\**" />
-    <EmbeddedResource Remove="Views\Admin Manager\**" />
-    <EmbeddedResource Remove="Views\Customer\**" />
-    <EmbeddedResource Remove="Views\Delivery Man\**" />
-    <EmbeddedResource Remove="Views\Front Office\**" />
-    <EmbeddedResource Remove="Views\Station Manager\**" />
-    <None Remove="Views\Admin Manager\**" />
-    <None Remove="Views\Customer\**" />
-    <None Remove="Views\Delivery Man\**" />
-    <None Remove="Views\Front Office\**" />
-    <None Remove="Views\Station Manager\**" />
+    <PackageReference Include="agora_rtc_sdk" Version="4.2.1" />
+    <PackageReference Include="FirebaseAdmin" Version="2.4.0" />
+    <PackageReference Include="FirebaseStorage.net" Version="1.0.3" />
+    <PackageReference Include="Google.Cloud.Firestore" Version="3.5.0" />
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="4.7.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.15" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="bin\Debug\net6.0\" />
+    <Folder Include="wwwroot\images\EventImg\" />
+    <Folder Include="wwwroot\lib\microsoft\" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿@model H4G_Project.Models.Member
+﻿@model H4G_Project.Models.User
 
 @{
     ViewData["Title"] = "Create";
@@ -30,7 +30,9 @@
         cursor: pointer
     }
 
-    input[type=text], input[type = email], input[type = password]:focus {
+    input[type=text],
+    input[type=email],
+    input[type=password]:focus {
         background-color: #fff;
         border-bottom: 2px solid #5fbae9;
     }
@@ -39,8 +41,8 @@
         width: 100%;
         max-width: 700px;
         margin: 5vh auto;
-        background: rgba(255,255,255,0.7);
-        background: radial-gradient(ellipse at center, rgba(255,255,255,0.2) 0%,rgba(255,255,255,0.43) 26%,rgba(255,255,255,0.9) 100%);
+        background: rgba(255, 255, 255, 0.7);
+        background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.43) 26%, rgba(255, 255, 255, 0.9) 100%);
         border: 1px solid #d8e2e7;
         border-radius: 5px;
         padding: 20px;
@@ -49,7 +51,7 @@
         overflow: hidden;
         opacity: 1;
         text-align: center;
-        transition: .3s cubic-bezier(.3,1.5,.7,1) transform;
+        transition: .3s cubic-bezier(.3, 1.5, .7, 1) transform;
     }
 
     input::-webkit-outer-spin-button,
@@ -67,10 +69,10 @@
         filter: grayscale(1)
     }
 
-        .sign-box .sign-avatar img {
-            display: block;
-            width: 100%;
-        }
+    .sign-box .sign-avatar img {
+        display: block;
+        width: 100%;
+    }
 
     .sign-box .btn {
         display: block;
@@ -79,9 +81,9 @@
         cursor: pointer
     }
 
-        .sign-box .btn.sign-up {
-            margin-top: 18px
-        }
+    .sign-box .btn.sign-up {
+        margin-top: 18px
+    }
 
     .sign-box .sign-note {
         text-align: center
@@ -93,24 +95,24 @@
         border-bottom: solid 1px transparent
     }
 
-        .sign-box a:hover {
-            border-bottom-color: rgba(0, 130, 198, .5)
-        }
+    .sign-box a:hover {
+        border-bottom-color: rgba(0, 130, 198, .5)
+    }
 
     .sign-box .form-group {
         margin-bottom: 12px;
         zoom: 1
     }
 
-        .sign-box .form-group:after,
-        .sign-box .form-group:before {
-            content: " ";
-            display: table
-        }
+    .sign-box .form-group:after,
+    .sign-box .form-group:before {
+        content: " ";
+        display: table
+    }
 
-        .sign-box .form-group:after {
-            clear: both
-        }
+    .sign-box .form-group:after {
+        clear: both
+    }
 
     .alert.hidden {
         display: none !important
@@ -128,9 +130,9 @@
         color: #c5d6de
     }
 
-        .sign-box .close:hover {
-            color: #00a8ff
-        }
+    .sign-box .close:hover {
+        color: #00a8ff
+    }
 
     ::-webkit-input-placeholder {
         color: #bbb !important;
@@ -149,33 +151,34 @@
         transition: all 0.2s
     }
 
-        .bot i {
-            font-size: 32px;
-            vertical-align: middle;
-            transform: rotate(90deg);
-            transition: all 0.4s
-        }
+    .bot i {
+        font-size: 32px;
+        vertical-align: middle;
+        transform: rotate(90deg);
+        transition: all 0.4s
+    }
 
-        .bot:hover i, .bot:hover span {
-            color: #678
-        }
+    .bot:hover i,
+    .bot:hover span {
+        color: #678
+    }
 
-        .bot .fa-check-circle {
-            color: #5bc0de !important;
-            transform: rotate(0deg);
-        }
+    .bot .fa-check-circle {
+        color: #5bc0de !important;
+        transform: rotate(0deg);
+    }
 
-        .bot span {
-            font-size: 14px;
-            padding: 0 0 0 10px;
-            display: inline-block;
-            text-shadow: 0 1px 0 #fff;
-        }
+    .bot span {
+        font-size: 14px;
+        padding: 0 0 0 10px;
+        display: inline-block;
+        text-shadow: 0 1px 0 #fff;
+    }
 
-        .bot.chk {
-            width: 28px;
-            background: #fff
-        }
+    .bot.chk {
+        width: 28px;
+        background: #fff
+    }
 
     .shake {
         transform-origin: center;
@@ -240,129 +243,31 @@
         position: absolute;
         top: 90vh;
         right: 1vh;
-        background: rgba(0,0,0,0.2);
-        box-shadow: 0 0 0px 3px rgba(0,0,0,0.2);
+        background: rgba(0, 0, 0, 0.2);
+        box-shadow: 0 0 0px 3px rgba(0, 0, 0, 0.2);
         opacity: 0.6
     }
 
-        #btn-twtr:hover {
-            color: #fff;
-            opacity: 1
-        }
+    #btn-twtr:hover {
+        color: #fff;
+        opacity: 1
+    }
 </style>
 
 <div class="container-fluid">
-    <form id='login' class="sign-box enters" method="post" asp-action="Create">
-        <!--For some reason the form tag styles changing does not change the opacity-->
 
-        <div class="sign-avatar">
-            <img src="/images/NpCourierLogo.png" alt="">
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-4">
-
-                <div class="form-outline">
-                    <label asp-for="name" class="form-label"></label>
-                    <input asp-for="name" type="text" class="form-control" placeholder="Name" />
-                    <span asp-validation-for="name" class="text-danger"></span>
-                </div>
-
-            </div>
-            <div class="col-md-6 mb-4">
-
-                <div class="form-outline">
-                    <label asp-for="birthDate" class="form-label"></label>
-                    <input type="date" asp-for="birthDate" class="form-control" />
-                    <span asp-validation-for="birthDate" class="text-danger"></span>
-                </div>
-
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-4">
-
-                <div class="form-outline">
-                    <label asp-for="emailAddr" class="form-label"></label>
-                    <input asp-for="emailAddr" type="email" class="form-control" placeholder="Name" />
-                    <span asp-validation-for="emailAddr" class="text-danger"></span>
-                </div>
-
-            </div>
-            <div class="col-md-6 mb-4">
-
-                <div class="form-outline">
-                    <label asp-for="password" class="form-label"></label>
-                    <input type="password" asp-for="password" class="form-control" />
-                    <span asp-validation-for="password" class="text-danger"></span>
-                </div>
-
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-4">
-
-                <div class="form-outline">
-                    <label asp-for="country" class="form-label"></label>
-                    <select asp-for="country" asp-items="@ViewData["Countries"] as List<SelectListItem> " id="CountryDropDown" class="form-control"></select>
-                    <span asp-validation-for="country" class="text-danger"></span>
-                </div>
-
-            </div>
-            <div class="col-md-6 mb-4">
-
-                <div class="form-outline">
-                    <label asp-for="city" class="form-label"></label>
-                    <select asp-for="city" asp-items="@ViewData["Cities"] as List<SelectListItem>" id="CityDropDown" class="form-control"></select>
-                    <span asp-validation-for="city" class="text-danger"></span>
-                </div>
-
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-4">
-
-                <div class="form-outline">
-                    <input asp-for="salutation" type="radio" value="Mr" checked class="form-check-input" />
-                    <span style="font-weight:normal;padding-right:20px">Mr</span>
-                    <input asp-for="salutation" type="radio" value="Mrs" class="form-check-input" />
-                    <span style="font-weight:normal;padding-right:20px">Mrs</span>
-                    <input asp-for="salutation" type="radio" value="Ms" class="form-check-input" />
-                    <span style="font-weight:normal;padding-right:20px">Ms</span>
-                    <input asp-for="salutation" type="radio" value="Dr" class="form-check-input" />
-                    <span style="font-weight:normal;padding-right:20px">Dr</span>
-                    <input asp-for="salutation" type="radio" value="Mdm" class="form-check-input" />
-                    <span style="font-weight:normal;padding-right:20px">Mdm</span>
-                </div>
-
-            </div>
-            <div class="col-md-6 mb-4">
-
-                <div class="form-outline">
-                    <label asp-for="telNo" class="form-label"></label>
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <input type="text" id="contacticc" readonly class="form-control" />
-                        </div>
-                        <div class="col-md-8">
-                            <input asp-for="telNo" class="form-control" type="number" />
-                        </div>
-                    </div>
-                    <span asp-validation-for="telNo" class="text-danger"></span>
-                </div>
-
-            </div>
-        </div>
-
-
-
-
-
-
-
+    @using (Html.BeginForm("NewUser", "User", FormMethod.Post, new { onsubmit = "return NewUser()" }))
+    {
+        <p>Username : <input type="text" name="Username" placeholder="Username" required /></p>
         <p>
-            <button type="submit" class="btn btn-info">Sign In</button>
+            Email Ad : <input type="email" name="Email" placeholder="Email" required />
         </p>
-    </form>
+        <p>
+            Password : <input type="password" name="Password" placeholder="Min:8 Chars" required />
+        <p></p>
+        </p>
+        <input type="submit" value="Sign Up" />
+    }
 </div>
 
 <script>

@@ -7,6 +7,7 @@ namespace H4G_Project.DAL
 {
     public class StaffDAL
     {
+        /*
         private IConfiguration Configuration { get; set; }
         private SqlConnection conn;
 
@@ -187,5 +188,6 @@ namespace H4G_Project.DAL
             return false;
             
         }
-	}
+        */
+    }
 }

@@ -1,12 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using H4G_Project.DAL;
-namespace H4G_Project.Models    
+namespace H4G_Project.Models
 {
     public class ValidateEmailExists : ValidationAttribute
     {
         private StaffDAL staffContext = new StaffDAL();
-        private MemberDAL memberContext = new MemberDAL();
+        private UserDAL userContext = new UserDAL();
 
+        /*
         protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
         {
             string email = Convert.ToString(value);
@@ -14,11 +15,11 @@ namespace H4G_Project.Models
             {
                 Staff staff = (Staff)validationContext.ObjectInstance;
             }
-            if (validationContext.ObjectInstance is Member)
+            if (validationContext.ObjectInstance is User)
             {
-                Member member = (Member)validationContext.ObjectInstance;
+                User member = (User)validationContext.ObjectInstance;
             }
-            if (staffContext.IsEmailExists(email) || memberContext.IsEmailExists(email))
+            if (staffContext.IsEmailExists(email) || userContext.IsEmailExists(email))
             {
                 return new ValidationResult("Email address already exists!");
             }
@@ -26,8 +27,9 @@ namespace H4G_Project.Models
             {
                 return ValidationResult.Success;
             }
-           
+
 
         }
+        */
     }
 }
