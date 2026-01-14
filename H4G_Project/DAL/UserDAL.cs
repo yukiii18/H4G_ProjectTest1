@@ -87,30 +87,6 @@ namespace H4G_Project.DAL
             return null;
         }
 
-        //Get Staff Email
-        public async Task<Staff> GetStaffByEmail(string email)
-        {
-            CollectionReference staffRef = db.Collection("Staff");
-
-            // Create a query against the collection.
-            Query query = staffRef.WhereEqualTo("Email", email);
-            QuerySnapshot querySnapshot = await query.GetSnapshotAsync();
-
-            if (querySnapshot.Documents.Count > 0)
-            {
-                // Assuming email is unique, there should only be one matching document.
-                DocumentSnapshot documentSnapshot = querySnapshot.Documents[0];
-                if (documentSnapshot.Exists)
-                {
-                    Staff staff = documentSnapshot.ConvertTo<Staff>();
-                    return staff;
-                }
-            }
-
-            // Return null if no user is found
-            return null;
-        }
-
         public async Task<bool> AddUser(User user)
         {
             // Hash the password before saving to the database

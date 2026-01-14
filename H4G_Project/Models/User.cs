@@ -32,6 +32,7 @@ namespace H4G_Project.Models
         [ValidateEmailExists]
         public string Email { get; set; }
 
+
         /*[Display (Name = "Salutation")]
         [RegularExpression("Mr|Mrs|Ms|Dr|Mdm", ErrorMessage = "Please select a valid salutation!")]
         [Required(ErrorMessage = "Please select a valid salutation!")]

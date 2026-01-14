@@ -1,0 +1,321 @@
+@model H4G_Project.Models.User
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" defer></script>
+
+<style>
+    @@import url('https://fonts.googleapis.com/css?family=Poppins');
+
+    body,
+    html {
+        overflow: hidden;
+        height: 100%;
+        background: #e2e7ec url('/images/CreateBackground.png');
+        background-size: cover;
+        color: #666
+    }
+
+    .container-fluid {
+        perspective: 300px;
+    }
+
+    .btn {
+        cursor: pointer
+    }
+
+    input[type=text],
+    input[type=email],
+    input[type=password]:focus {
+        background-color: #fff;
+        border-bottom: 2px solid #5fbae9;
+    }
+
+    .sign-box {
+        width: 100%;
+        max-width: 700px;
+        margin: 5vh auto;
+        background: rgba(255, 255, 255, 0.7);
+        background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.43) 26%, rgba(255, 255, 255, 0.9) 100%);
+        border: 1px solid #d8e2e7;
+        border-radius: 5px;
+        padding: 20px;
+        font-size: 1rem;
+        position: relative;
+        overflow: hidden;
+        opacity: 1;
+        text-align: center;
+        transition: .3s cubic-bezier(.3, 1.5, .7, 1) transform;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        display: none;
+    }
+
+    .enters {
+        animation: slidedown 1.84s 1;
+    }
+
+    .sign-box .sign-avatar {
+        width: 200px;
+        margin: 30px auto;
+        filter: grayscale(1)
+    }
+
+    .sign-box .sign-avatar img {
+        display: block;
+        width: 100%;
+    }
+
+    .sign-box .btn {
+        display: block;
+        min-width: 108px;
+        margin: 16px auto 12px;
+        cursor: pointer
+    }
+
+    .sign-box .btn.sign-up {
+        margin-top: 18px
+    }
+
+    .sign-box .sign-note {
+        text-align: center
+    }
+
+    .sign-box a {
+        text-decoration: none;
+        color: #0082c6;
+        border-bottom: solid 1px transparent
+    }
+
+    .sign-box a:hover {
+        border-bottom-color: rgba(0, 130, 198, .5)
+    }
+
+    .sign-box .form-group {
+        margin-bottom: 12px;
+        zoom: 1
+    }
+
+    .sign-box .form-group:after,
+    .sign-box .form-group:before {
+        content: " ";
+        display: table
+    }
+
+    .sign-box .form-group:after {
+        clear: both
+    }
+
+    .alert.hidden {
+        display: none !important
+    }
+
+    .sign-box .reset {
+        font-size: .875rem
+    }
+
+    .sign-box .close {
+        position: absolute;
+        right: 10px;
+        top: 4px;
+        opacity: 1;
+        color: #c5d6de
+    }
+
+    .sign-box .close:hover {
+        color: #00a8ff
+    }
+
+    ::-webkit-input-placeholder {
+        color: #bbb !important;
+    }
+
+    .bot {
+        color: #999 !important;
+        border: 0px solid #ddd !important;
+        background: #ddd;
+        overflow: hidden;
+        display: inline-block;
+        width: 140px;
+        white-space: nowrap;
+        text-align: left;
+        border-radius: 20px;
+        transition: all 0.2s
+    }
+
+    .bot i {
+        font-size: 32px;
+        vertical-align: middle;
+        transform: rotate(90deg);
+        transition: all 0.4s
+    }
+
+    .bot:hover i,
+    .bot:hover span {
+        color: #678
+    }
+
+    .bot .fa-check-circle {
+        color: #5bc0de !important;
+        transform: rotate(0deg);
+    }
+
+    .bot span {
+        font-size: 14px;
+        padding: 0 0 0 10px;
+        display: inline-block;
+        text-shadow: 0 1px 0 #fff;
+    }
+
+    .bot.chk {
+        width: 28px;
+        background: #fff
+    }
+
+    .shake {
+        transform-origin: center;
+        animation-name: shake;
+        animation-duration: 400ms;
+        animation-iteration-count: 1;
+        animation-timing-function: ease-in-out
+    }
+
+    @@keyframes slidedown {
+        0% {
+            max-height: 0px;
+            opacity: 0
+        }
+
+        100% {
+            max-height: 600px;
+            opacity: 1
+        }
+    }
+
+    @@keyframes shake {
+        0% {
+            transform: none
+        }
+
+        12.5% {
+            transform: translateX(-6px) rotateY(-5deg)
+        }
+
+        37.5% {
+            transform: translateX(5px) rotateY(4deg)
+        }
+
+        62.5% {
+            transform: translateX(-3px) rotateY(-3deg)
+        }
+
+        87.5% {
+            transform: translateX(2px) rotateY(2deg)
+        }
+
+        100% {
+            transform: none
+        }
+    }
+
+
+    #btn-twtr {
+        clear: both;
+        color: #fff;
+        border: 2px solid;
+        border-radius: 3px;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+        font-family: sans-serif;
+        font-size: 14px;
+        width: 13em;
+        padding: 5px 10px;
+        font-weight: 600;
+        position: absolute;
+        top: 90vh;
+        right: 1vh;
+        background: rgba(0, 0, 0, 0.2);
+        box-shadow: 0 0 0px 3px rgba(0, 0, 0, 0.2);
+        opacity: 0.6
+    }
+
+    #btn-twtr:hover {
+        color: #fff;
+        opacity: 1
+    }
+</style>
+
+<div class="container-fluid">
+    @using (Html.BeginForm("NewStaff", "Staff", FormMethod.Post, new { onsubmit = "return NewUser()" }))
+    {
+        <p>
+            Username : <input type="text" name="Username" placeholder="Username" required />
+        </p>
+        <p>
+            Email Address : <input type="email" name="Email" placeholder="Email" required />
+        </p>
+        <p>
+            Password : <input type="password" name="Password" placeholder="Min:8 Chars" required />
+        </p>
+        <p>
+            Last Day Of Service : <input type="date" name="LastDayOfService" />
+        </p>
+        <input type="submit" value="Sign Up" />
+    }
+</div>
+
+<script>
+    const Countrydropdown = document.getElementById('CountryDropDown');
+    const CityDropdown = document.getElementById('CityDropDown');
+    const contactInput = document.getElementById('contacticc')
+    Countrydropdown.addEventListener("change", function () {
+        const country = Countrydropdown.value
+        if (country != null) {
+            fetch('https://raw.githubusercontent.com/russ666/all-countries-and-cities-json/master/countries.json') //find directory for countries.json and the internationalcalling code
+                .then(response => response.json())
+                .then(data => {
+                    const cities = data[country];
+                    CityDropdown.innerHTML = '';
+                    cities.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city;
+                        option.text = city;
+                        CityDropdown.appendChild(option);
+                    });
+
+                })
+            fetch('https://gist.githubusercontent.com/anubhavshrimal/75f6183458db8c453306f93521e93d37/raw/f77e7598a8503f1f70528ae1cbf9f66755698a16/CountryCodes.json') //find directory for internationalcode.json in the directory and put here i just use api for now
+                .then(response => response.json())
+                .then(data => {
+                    const countryvalue = data.find(obj => obj.name === country);
+
+                    if (countryvalue == null) {
+                        contactInput.value = "";
+                    }
+                    else {
+                        contactInput.value = countryvalue.dial_code;
+                    }
+
+                })
+
+        }
+        else {
+            const placeholderOption = document.createElement('option');
+            placeholderOption.value = '';
+            placeholderOption.text = 'Select a city';
+            placeholderOption.disabled = true;
+            placeholderOption.selected = true;
+            CityDropdown.appendChild(placeholderOption);
+        }
+    }); ``
+
+</script>

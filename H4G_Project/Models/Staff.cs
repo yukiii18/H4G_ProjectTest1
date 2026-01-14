@@ -1,12 +1,41 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Google.Cloud.Firestore;
+using Google.Type;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using DateTime = System.DateTime;
 
 
 namespace H4G_Project.Models
 {
+    [FirestoreData]
     public class Staff
     {
-        [Display (Name = "ID")]
+        [FirestoreProperty]
+        [Display(Name = "Username")]
+        [StringLength(50, ErrorMessage = "Name cannot exceed 50 characters")]
+        [Required(ErrorMessage = "Please input a name!")]
+        public string Username { get; set; }
+
+        [FirestoreProperty]
+        [Display(Name = "Password")]
+        [StringLength(25, ErrorMessage = "Password cannot exceed 25 characters")]
+        [Required(ErrorMessage = "Please input a password!")]
+        public string Password { get; set; }
+
+        [FirestoreProperty]
+        [Display(Name = "Email")]
+        [RegularExpression(@"^.+@.+\..+$", ErrorMessage = "Invalid Email")]
+        [StringLength(50, ErrorMessage = "Email address cannot exceed 50 characters")]
+        [Required(ErrorMessage = "Please input an email address!")]
+        [EmailAddress]
+        [ValidateEmailExists]
+        public string Email { get; set; }
+
+        [FirestoreProperty]
+        [Display(Name = "LastDayOfService")]
+        public DateTime LastDayOfService { get; set; }
+
+        /*[Display (Name = "ID")]
         public int staffID { get; set; }
         [Display (Name = "Name")]
         [StringLength (50,ErrorMessage = "Name length cannot be more than 50 characters")]
@@ -34,5 +63,6 @@ namespace H4G_Project.Models
         [Display(Name = "Location")]
         [StringLength(50, ErrorMessage = "Location cannot be more than 50 characters")]
         public string? location { get; set; }
+        */
     }
 }

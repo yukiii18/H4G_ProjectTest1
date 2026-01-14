@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "User";
+    var successMessage = TempData["SuccessMessage"] as string;
+    Layout = "~/Views/Shared/_Staff.cshtml";
+    string message = TempData["Message"]?.ToString();
+}
+
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
+
+<div class="container mt-4">
+
+    <h3 class="mb-3">Calendar</h3>
+
+    <!-- Calendar Container -->
+    <div id="calendar"></div>
+
+</div>
+
+@section Scripts {
+
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+    <!-- SweetAlert -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 'auto',
+
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+
+                events: '/Calendar/GetEvents',
+
+                dateClick: function (info) {
+                    Swal.fire({
+                        title: 'Date selected',
+                        text: info.dateStr,
+                        icon: 'info'
+                    });
+                },
+
+                eventClick: function (info) {
+                    Swal.fire({
+                        title: info.event.title,
+                        text: 'Event clicked',
+                        icon: 'success'
+                    });
+                }
+            });
+
+            calendar.render();
+        });
+    </script>
+
+    @* Show success message *@
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: '@successMessage'
+            });
+        </script>
+    }
+}

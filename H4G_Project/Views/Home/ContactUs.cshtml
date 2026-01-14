@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<H4G_Project.Models.Staff>
 @{
-    ViewData["Title"] = "ContactUs";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "ContactUs";
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h1>ContactUs</h1>
@@ -17,17 +17,15 @@
 					<th>Staff Name</th>
 					<th>Appointment</th>
 					<th>Office Tel No</th>
-					<th>Location</th>
 			</thead>
 			<tbody>
 
 				@foreach (var item in Model)
 				{
 					<tr>
-						<td>@item.staffName</td>
-						<td>@item.appointment</td>
-						<td>@item.officeTelNo</td>
-						<td>@item.location</td>
+						<td>@item.Username</td>
+						<td>@item.Email</td>
+						<td>@item.LastDayOfService</td>
 					</tr>
 				}
 			</tbody>
@@ -38,5 +36,3 @@ else
 {
 	<span style="color:red">No record found!</span>
 }
-
-

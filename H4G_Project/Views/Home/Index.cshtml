@@ -342,14 +342,25 @@
             <br />
             <span style="color:red;">@TempData["MemberMessage"]</span>
         }
-        <form class="staff" style="display:none" method="post" action="~/Home/Login">
-            <h3 class="fadeIn first">Sign In as Staff</h3><br />
-            <input type="text" id="stafflogin" class="fadeIn second" name="stafflogin" placeholder="Login Id"><br />
-            <input type="password" id="staffpassword" class="fadeIn third" name="staffpassword"
-                placeholder="Password"><br /><br /><br />
-            <input type="submit" class="fadeIn fourth" value="Log In"><br />
+        @using (Html.BeginForm("LogInUser", "Staff", FormMethod.Post, new { onsubmit = "return SignIn()" }))
+        {
+            <h3 class="fadeIn first">Sign In as Staff</h3>
+
+            <br />
+            <input type="email" id="email" class="fadeIn second" name="email" placeholder="Email">
+
+            <br />
+            <input type="password" id="password" class="fadeIn third" name="password" placeholder="Password">
+
+            <br />
+            <br />
+
+            <br />
+            <input type="submit" class="fadeIn fourth" value="Log In">
+
+            <br />
             <span style="color:red;">@TempData["StaffMessage"]</span>
-        </form>
+        }
     </div>
 </div>
 

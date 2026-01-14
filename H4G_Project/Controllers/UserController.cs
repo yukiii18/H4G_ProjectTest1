@@ -36,7 +36,6 @@ namespace H4G_Project.Controllers
                 Password = form["Password"] // Bind the password from the form
             };
 
-
             // Hash the password before saving to the database
             //user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
 
@@ -57,6 +56,8 @@ namespace H4G_Project.Controllers
                 return View("NewUser"); // Error
             }
         }
+
+
         public async Task<ActionResult> LogInUser()
         {
             User user = new User();
@@ -70,7 +71,6 @@ namespace H4G_Project.Controllers
             // Assuming you have a method like GetUserByEmail in your AuthDAL
             User user = await userContext.GetUserByEmail(form["Email"]);
 
-            Console.WriteLine("this is ran");
             if (user != null)
             {
                 // Replace this with a hash comparison if you implement hashed passwords
