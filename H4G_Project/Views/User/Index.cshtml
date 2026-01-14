@@ -5,35 +5,74 @@
     string message = TempData["Message"]?.ToString();
 }
 
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
 
-<!DOCTYPE html>
-<html>
+<div class="container mt-4">
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-        type="text/css" />
-    <link rel="stylesheet" href="theme.css" type="text/css" />
-    <link rel="stylesheet" href="static/theme.css" />
-</head>
+    <h3 class="mb-3">Calendar</h3>
 
-<body>
-    testing
-</body>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-    crossorigin="anonymous"></script>
-<!-- Add the SweetAlert CSS -->
-<link href="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.min.css" rel="stylesheet" />
+    <!-- Calendar Container -->
+    <div id="calendar"></div>
 
-<!-- Add the SweetAlert JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.all.min.js"></script>
+</div>
 
-</html>
+@section Scripts {
+
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+    <!-- SweetAlert -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 'auto',
+
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+
+                events: '/Calendar/GetEvents',
+
+                dateClick: function (info) {
+                    Swal.fire({
+                        title: 'Date selected',
+                        text: info.dateStr,
+                        icon: 'info'
+                    });
+                },
+
+                eventClick: function (info) {
+                    Swal.fire({
+                        title: info.event.title,
+                        text: 'Event clicked',
+                        icon: 'success'
+                    });
+                }
+            });
+
+            calendar.render();
+        });
+    </script>
+
+    @* Show success message *@
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: '@successMessage'
+            });
+        </script>
+    }
+}
