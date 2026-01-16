@@ -26,6 +26,28 @@ namespace H4G_Project.DAL
             }.Build();
         }
 
+        // 🔹 Get all event registrations (FOR REPORTS)
+        public async Task<List<EventRegistration>> GetAllRegistrations()
+        {
+            CollectionReference regRef = db.Collection("eventRegistrations");
+            QuerySnapshot snapshot = await regRef.GetSnapshotAsync();
+
+            List<EventRegistration> registrations = new();
+
+            foreach (DocumentSnapshot doc in snapshot.Documents)
+            {
+                if (doc.Exists)
+                {
+                    EventRegistration reg = doc.ConvertTo<EventRegistration>();
+                    reg.Id = doc.Id;
+                    registrations.Add(reg);
+                }
+            }
+
+            return registrations;
+        }
+
+
         // 🔹 Get all events (for FullCalendar)
         public async Task<List<Event>> GetAllEvents()
         {

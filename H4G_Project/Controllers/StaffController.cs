@@ -86,6 +86,50 @@ namespace H4G_Project.Controllers
         }
 
         // ======================================================
+        // 🔹 REPORTS
+        // ======================================================
+
+        [HttpGet]
+        public async Task<IActionResult> Reports(string roleFilter, string eventFilter)
+        {
+            var registrations = await eventsDAL.GetAllRegistrations();
+
+            // Get unique options for dropdowns
+            var allRoles = registrations
+                .Where(r => !string.IsNullOrEmpty(r.Role))
+                .Select(r => r.Role)
+                .Distinct()
+                .ToList();
+
+            var allEvents = registrations
+                .Where(r => !string.IsNullOrEmpty(r.EventName))
+                .Select(r => r.EventName)
+                .Distinct()
+                .ToList();
+
+            ViewData["AllRoles"] = allRoles;
+            ViewData["AllEvents"] = allEvents;
+
+            // Apply filters
+            if (!string.IsNullOrEmpty(roleFilter))
+                registrations = registrations
+                    .Where(r => r.Role != null && r.Role.Equals(roleFilter, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+            if (!string.IsNullOrEmpty(eventFilter))
+                registrations = registrations
+                    .Where(r => r.EventName != null && r.EventName.Equals(eventFilter, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+            // Keep current filter selections
+            ViewData["RoleFilter"] = roleFilter;
+            ViewData["EventFilter"] = eventFilter;
+
+            return View(registrations);
+        }
+
+
+        // ======================================================
         // 🔹 EVENT MANAGEMENT (ADDED)
         // ======================================================
 
