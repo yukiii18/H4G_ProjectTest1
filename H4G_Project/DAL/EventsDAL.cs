@@ -69,6 +69,54 @@ namespace H4G_Project.DAL
             return events;
         }
 
+        public async Task<List<Event>> GetEventsByUserEmail()
+        {
+            CollectionReference eventsRef = db.Collection("events");
+            QuerySnapshot snapshot = await eventsRef.GetSnapshotAsync();
+
+            List<Event> events = new List<Event>();
+
+            foreach (DocumentSnapshot doc in snapshot.Documents)
+            {
+                if (doc.Exists)
+                {
+                    Event ev = doc.ConvertTo<Event>();
+                    ev.Id = doc.Id;
+                    events.Add(ev);
+                }
+            }
+
+            return events;
+        }
+
+        /*
+        public async Task<Event> ExtractEventByID(string eid)
+        {
+            CollectionReference eventRef = db.Collection("events");
+            QuerySnapshot snapshot = await eventRef.GetSnapshotAsync(); //Once connected to the database, this calls out specifally for the documents inside the Events collection
+            Event @event = new Event();
+
+            foreach (DocumentSnapshot document in snapshot.Documents)
+            {
+                if (document.Id == eid)
+                {
+                    int eventId;
+                    if (int.TryParse(document.Id, out eventId))
+                    {
+                        @event.eventID = eventId;
+
+                    }
+
+                    Dictionary<string, dynamic> documentDictionary = document.ToDictionary();
+
+                    @event.name = documentDictionary["name"].ToString();
+                    @event.details = documentDictionary["details"].ToString();
+                    @event.eventPhoto = documentDictionary["eventPhoto"].ToString();
+
+                }
+            }
+        }*/
+
         // 🔹 Add event
         public async Task<bool> AddEvent(Event ev)
         {
@@ -147,7 +195,7 @@ namespace H4G_Project.DAL
             {
                 DocumentReference docRef = db.Collection("eventRegistrations").Document(registrationId);
                 DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
-                
+
                 if (snapshot.Exists)
                 {
                     EventRegistration registration = snapshot.ConvertTo<EventRegistration>();
@@ -169,7 +217,7 @@ namespace H4G_Project.DAL
             try
             {
                 DocumentReference docRef = db.Collection("eventRegistrations").Document(registrationId);
-                
+
                 Dictionary<string, object> updates = new Dictionary<string, object>
                 {
                     { "paymentStatus", paymentStatus },

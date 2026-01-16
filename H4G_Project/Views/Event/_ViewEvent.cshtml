@@ -1,0 +1,63 @@
+@model dynamic
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="~/css/event.css">
+    <script src="/js/forum.js"></script>
+
+    <link href="https://unpkg.com/nes.css/css/nes.css" rel="stylesheet" />
+    <script src="/js/script.js"></script>
+    <link rel="stylesheet" href="/css/bttBtn.css">
+    <link rel="stylesheet" href="/css/pingu.css">
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</head>
+
+<body>
+    <style>
+        .column {
+            float: left;
+            padding: 10px;
+        }
+
+        .column.left.side {
+            width: 80%
+        }
+
+        .column.right.side {
+            width: 20%
+        }
+    </style>
+    <div class="gif-container">
+        <div class="gif-text">Use me to translate!</div>
+        <img src="/images/penguin.gif" style="max-width:50%; object-fit:contain; height: 10em;" alt="Your GIF">
+    </div>
+    <div id="google_translate_element"></div><br /><br />
+    <h2>List of Events</h2>
+    <div class="column left side" style="height:100%; overflow:hidden;">
+        <div class="container" style="height:700px; overflow-y:auto;">
+            <div class="row">
+                @foreach (Event events in Model.Event)
+                {
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <p class="card-title">
+                                    <a asp-controller="Event" asp-action="DetailedIndex" asp-route-eventId="@events.eventID"
+                                        class="card-title">
+                                        <h5>@events.Name</h5>
+                                    </a>
+                                </p>
+                                <p class="card-text">
+                                    <img src="@Url.Content(events.eventPhoto)" alt="Event Photo" height="200" width="100%">
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</body>

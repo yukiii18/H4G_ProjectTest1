@@ -11,10 +11,19 @@ namespace H4G_Project.Models
         [FirestoreDocumentId]
         public string Id { get; set; }
 
+        [FirestoreProperty("eventID")]
+        public int eventID { get; set; }
+
         [FirestoreProperty("name")]
         [Required(ErrorMessage = "Event name is required")]
         [StringLength(100)]
         public string Name { get; set; }
+
+        [FirestoreProperty("details")]
+        public string details { get; set; }
+
+        [FirestoreProperty("eventPhoto")]
+        public string eventPhoto { get; set; }
 
         [FirestoreProperty("start")]
         [Required]
