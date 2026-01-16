@@ -57,83 +57,278 @@
                     const eventTitle = info.event.title;
                     const eventDate = info.event.startStr;
 
+                    // Get user role from ViewBag (set by controller)
+                    const userRole = '@ViewBag.UserRole';
+                    
+                    // Skip role selection, go directly to registration form
+                    showRegistrationForm(eventId, eventTitle, eventDate, userRole);
+                }
+            });
+
+            calendar.render();
+
+            // Helper functions defined outside calendar object
+            function showRegistrationForm(eventId, eventTitle, eventDate, role) {
+                    // Normalize role to have first letter capitalized
+                    role = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+                    
+                    // Step 2: Show registration form based on role
+                    const volunteerFields = role === 'Volunteer' ? `
+                        <div class="form-group text-left mt-2">
+                            <label>Preferred Role/Task</label>
+                            <textarea id="PreferredRole" class="form-control" rows="2" placeholder="e.g., Setup, Registration desk, Cleanup, Photography"></textarea>
+                        </div>
+                        <div class="form-group text-left mt-2">
+                            <label>Skills/Experience</label>
+                            <textarea id="Skills" class="form-control" rows="2" placeholder="e.g., Event management, First aid"></textarea>
+                        </div>
+                    ` : '';
+
+                    const participantFields = role === 'Participant' ? `
+                        <div class="form-group text-left mt-2">
+                            <label>Dietary Requirements</label>
+                            <textarea id="DietaryRequirements" class="form-control" rows="2" placeholder="e.g., Vegetarian, Allergies"></textarea>
+                        </div>
+                        <div class="form-group text-left mt-2">
+                            <label>Emergency Contact</label>
+                            <input type="text" id="EmergencyContact" class="form-control" placeholder="Name and phone number" />
+                        </div>
+                    ` : '';
+
+                    const roleInfo = role === 'Volunteer' 
+                        ? '<p class="text-success">Thank you for volunteering! Registration is free.</p>'
+                        : '<p class="text-info">Registration fee: $50.00</p>';
+
                     Swal.fire({
-                        title: 'Register for Event',
+                        title: `Register as ${role}`,
                         html: `
-                            <form id="registerForm">
-                                <input type="hidden" id="EventId" value="${eventId}" />
+                            <div style="max-height: 60vh; overflow-y: auto; padding: 10px;">
+                                ${roleInfo}
+                                <form id="registerForm">
+                                    <input type="hidden" id="EventId" value="${eventId}" />
+                                    <input type="hidden" id="Role" value="${role}" />
 
-                                <div class="form-group text-left">
-                                    <label>Event</label>
-                                    <input class="form-control" value="${eventTitle}" readonly />
-                                </div>
+                                    <div class="form-group text-left">
+                                        <label>Event</label>
+                                        <input class="form-control" value="${eventTitle}" readonly />
+                                    </div>
 
-                                <div class="form-group text-left mt-2">
-                                    <label>Date</label>
-                                    <input class="form-control" value="${eventDate}" readonly />
-                                </div>
+                                    <div class="form-group text-left mt-2">
+                                        <label>Date</label>
+                                        <input class="form-control" value="${eventDate}" readonly />
+                                    </div>
 
-                                <div class="form-group text-left mt-2">
-                                    <label>Your Name</label>
-                                    <input type="text" id="Name" class="form-control" required />
-                                </div>
+                                    <div class="form-group text-left mt-2">
+                                        <label>Full Name *</label>
+                                        <input type="text" id="FullName" class="form-control" required />
+                                        <small class="text-danger" id="nameError" style="display:none;">Please enter your full name</small>
+                                    </div>
 
-                                <div class="form-group text-left mt-2">
-                                    <label>Email</label>
-                                    <input type="email" id="Email" class="form-control" required />
-                                </div>
-                            </form>
+                                    <div class="form-group text-left mt-2">
+                                        <label>Email *</label>
+                                        <input type="email" id="Email" class="form-control" required />
+                                        <small class="text-danger" id="emailError" style="display:none;">Please enter a valid email address</small>
+                                    </div>
+
+                                    <div class="form-group text-left mt-2">
+                                        <label>Phone Number</label>
+                                        <input type="tel" id="PhoneNumber" class="form-control" 
+                                               placeholder="12345678" maxlength="8" />
+                                        <small class="text-muted">Optional: 8 digits</small>
+                                        <small class="text-danger" id="phoneError" style="display:none;">Please enter exactly 8 digits</small>
+                                    </div>
+
+                                    ${volunteerFields}
+                                    ${participantFields}
+                                </form>
+                            </div>
                         `,
+                        width: '600px',
                         showCancelButton: true,
-                        confirmButtonText: 'Register',
-                        cancelButtonText: 'Cancel',
+                        confirmButtonText: 'Submit Registration',
+                        cancelButtonText: 'Back',
                         focusConfirm: false,
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            // Add real-time validation
+                            const emailInput = document.getElementById('Email');
+                            const emailError = document.getElementById('emailError');
+                            const nameInput = document.getElementById('FullName');
+                            const nameError = document.getElementById('nameError');
+                            const phoneInput = document.getElementById('PhoneNumber');
+                            const phoneError = document.getElementById('phoneError');
+
+                            emailInput.addEventListener('blur', function() {
+                                // Simple email validation - just check for @@ and .
+                                if (this.value && (!this.value.includes('@@') || !this.value.includes('.'))) {
+                                    emailError.style.display = 'block';
+                                    this.classList.add('is-invalid');
+                                } else {
+                                    emailError.style.display = 'none';
+                                    this.classList.remove('is-invalid');
+                                }
+                            });
+
+                            nameInput.addEventListener('blur', function() {
+                                if (!this.value.trim()) {
+                                    nameError.style.display = 'block';
+                                    this.classList.add('is-invalid');
+                                } else {
+                                    nameError.style.display = 'none';
+                                    this.classList.remove('is-invalid');
+                                }
+                            });
+
+                            phoneInput.addEventListener('blur', function() {
+                                // Phone validation: exactly 8 digits
+                                if (this.value && this.value.length !== 8) {
+                                    phoneError.style.display = 'block';
+                                    this.classList.add('is-invalid');
+                                } else {
+                                    phoneError.style.display = 'none';
+                                    this.classList.remove('is-invalid');
+                                }
+                            });
+                        },
                         preConfirm: () => {
+                            const fullName = document.getElementById('FullName').value.trim();
+                            const email = document.getElementById('Email').value.trim();
+                            const phoneNumber = document.getElementById('PhoneNumber').value.trim();
 
-                            const name = document.getElementById('Name').value;
-                            const email = document.getElementById('Email').value;
+                            // Validate full name
+                            if (!fullName) {
+                                Swal.showValidationMessage('Please enter your full name');
+                                return false;
+                            }
 
-                            if (!name || !email) {
-                                Swal.showValidationMessage('Please fill in all fields');
+                            // Validate email format - simple check
+                            if (!email || !email.includes('@@') || !email.includes('.')) {
+                                Swal.showValidationMessage('Please enter a valid email address (e.g., name@@example.com)');
+                                return false;
+                            }
+
+                            // Validate phone number if provided - exactly 8 digits
+                            if (phoneNumber && phoneNumber.length !== 8) {
+                                Swal.showValidationMessage('Please enter a valid phone number (8 digits)');
                                 return false;
                             }
 
                             return {
                                 eventId: eventId,
-                                name: name,
-                                email: email
+                                eventName: eventTitle,
+                                role: role,
+                                fullName: fullName,
+                                email: email,
+                                phoneNumber: phoneNumber,
+                                preferredRole: role === 'Volunteer' ? document.getElementById('PreferredRole').value : null,
+                                skills: role === 'Volunteer' ? document.getElementById('Skills').value : null,
+                                dietaryRequirements: role === 'Participant' ? document.getElementById('DietaryRequirements').value : null,
+                                emergencyContact: role === 'Participant' ? document.getElementById('EmergencyContact').value : null
                             };
                         }
                     }).then((result) => {
-
                         if (result.isConfirmed) {
-
-                            fetch('/Calendar/Register', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'RequestVerificationToken':
-                                        document.querySelector('input[name="__RequestVerificationToken"]').value
-                                },
-                                body: JSON.stringify(result.value)
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    Swal.fire('Success', data.message, 'success');
-                                } else {
-                                    Swal.fire('Error', data.message, 'error');
-                                }
-                            })
-                            .catch(() => {
-                                Swal.fire('Error', 'Something went wrong', 'error');
-                            });
+                            submitRegistration(result.value);
                         }
                     });
                 }
-            });
 
-            calendar.render();
+                function submitRegistration(registrationData) {
+                    // Step 3: Submit registration
+                    fetch('/Calendar/Register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken':
+                                document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify(registrationData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (data.requiresPayment) {
+                                // Step 4: Show payment for participants
+                                showPaymentModal(data.registrationId, data.qrCode, data.paymentAmount);
+                            } else {
+                                // Volunteer - no payment needed
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Registration Successful!',
+                                    html: `
+                                        <p>Your registration has been confirmed.</p>
+                                        <p><strong>Registration ID:</strong> ${data.registrationId}</p>
+                                        <p><strong>QR Code:</strong> ${data.qrCode}</p>
+                                    `
+                                });
+                            }
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire('Error', 'Something went wrong', 'error');
+                    });
+                }
+
+                function showPaymentModal(registrationId, qrCode, amount) {
+                    // Step 4: Show mock QR code for payment
+                    Swal.fire({
+                        title: 'Payment Required',
+                        html: `
+                            <h5>Scan QR Code to Pay</h5>
+                            <div style="background: #f0f0f0; padding: 20px; margin: 20px 0; border-radius: 8px;">
+                                <div style="background: #000; color: #fff; padding: 30px; font-family: monospace; font-size: 14px; word-break: break-all;">
+                                    ${qrCode}
+                                </div>
+                            </div>
+                            <p><strong>Amount: $${amount.toFixed(2)}</strong></p>
+                            <p class="text-muted small">This is a mock QR code for prototype purposes</p>
+                        `,
+                        showCancelButton: false,
+                        confirmButtonText: "I've Completed Payment",
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            confirmPayment(registrationId, qrCode);
+                        }
+                    });
+                }
+
+                function confirmPayment(registrationId, qrCode) {
+                    // Step 5: Confirm payment and update database
+                    fetch('/Calendar/ConfirmPayment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken':
+                                document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify({
+                            registrationId: registrationId,
+                            qrCode: qrCode
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Payment Confirmed!',
+                                html: `
+                                    <p>Your registration and payment have been confirmed.</p>
+                                    <p><strong>Registration ID:</strong> ${data.registration.id}</p>
+                                    <p><strong>QR Code:</strong> ${data.registration.qrCode}</p>
+                                `
+                            });
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire('Error', 'Payment confirmation failed', 'error');
+                    });
+                }
         });
     </script>
 

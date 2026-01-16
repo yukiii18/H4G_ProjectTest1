@@ -102,5 +102,71 @@ namespace H4G_Project.DAL
                 return false;
             }
         }
+
+        // 🔹 Add event registration
+        public async Task<string> AddRegistration(EventRegistration registration)
+        {
+            try
+            {
+                DocumentReference docRef = await db.Collection("eventRegistrations").AddAsync(registration);
+                return docRef.Id;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding registration: {ex.Message}");
+                return null;
+            }
+        }
+
+        // 🔹 Get registration by ID
+        public async Task<EventRegistration> GetRegistrationById(string registrationId)
+        {
+            try
+            {
+                DocumentReference docRef = db.Collection("eventRegistrations").Document(registrationId);
+                DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+                
+                if (snapshot.Exists)
+                {
+                    EventRegistration registration = snapshot.ConvertTo<EventRegistration>();
+                    registration.Id = snapshot.Id;
+                    return registration;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting registration: {ex.Message}");
+                return null;
+            }
+        }
+
+        // 🔹 Update payment status
+        public async Task<bool> UpdatePaymentStatus(string registrationId, string paymentStatus, string qrCode = null)
+        {
+            try
+            {
+                DocumentReference docRef = db.Collection("eventRegistrations").Document(registrationId);
+                
+                Dictionary<string, object> updates = new Dictionary<string, object>
+                {
+                    { "paymentStatus", paymentStatus },
+                    { "paymentDate", Timestamp.FromDateTime(DateTime.UtcNow) }
+                };
+
+                if (!string.IsNullOrEmpty(qrCode))
+                {
+                    updates["qrCode"] = qrCode;
+                }
+
+                await docRef.UpdateAsync(updates);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating payment status: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

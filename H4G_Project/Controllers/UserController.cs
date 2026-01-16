@@ -15,6 +15,10 @@ namespace H4G_Project.Controllers
         {
             string memberEmail = HttpContext.Session.GetString("email");
             User user = await userContext.GetUserByEmail(memberEmail);
+            
+            // Pass user role to view
+            ViewBag.UserRole = HttpContext.Session.GetString("UserRole") ?? "Participant";
+            
             return View();
         }
 
@@ -81,10 +85,11 @@ namespace H4G_Project.Controllers
                     //var userData = new { user.Username, user.Email };
                     //string userJson = System.Text.Json.JsonSerializer.Serialize(userData);
                     HttpContext.Session.SetString("Username", user.Username);
+                    HttpContext.Session.SetString("UserEmail", user.Email);
+                    HttpContext.Session.SetString("UserRole", user.Role ?? "Participant"); // Store role, default to Participant
                     TempData["Username"] = user.Username;
                     TempData.Keep("Username");
                     Console.WriteLine(TempData["Username"]);
-                    HttpContext.Session.SetString("UserEmail", user.Email);
                     return RedirectToAction("Index", "User");
                 }
             }
