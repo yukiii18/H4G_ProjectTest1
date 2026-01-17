@@ -41,7 +41,7 @@ namespace H4G_Project.Controllers
             {
                 id = eventDetails.Id,
                 name = eventDetails.Name,
-                details = eventDetails.details,
+                details = eventDetails.Details,
                 eventPhoto = eventDetails.eventPhoto,
                 start = eventDetails.Start.ToDateTime().ToString("yyyy-MM-dd HH:mm"),
                 end = eventDetails.End.HasValue ? eventDetails.End.Value.ToDateTime().ToString("yyyy-MM-dd HH:mm") : null

@@ -20,7 +20,7 @@ namespace H4G_Project.Models
         public string Name { get; set; }
 
         [FirestoreProperty("details")]
-        public string details { get; set; }
+        public string Details { get; set; }
 
         [FirestoreProperty("eventPhoto")]
         public string eventPhoto { get; set; }
@@ -31,5 +31,14 @@ namespace H4G_Project.Models
 
         [FirestoreProperty("end")]
         public Timestamp? End { get; set; }
+
+        [FirestoreProperty("registrationDueDate")]
+        [Required(ErrorMessage = "Registration due date is required")]
+        public Timestamp RegistrationDueDate { get; set; }
+
+        [FirestoreProperty("maxParticipants")]
+        [Required(ErrorMessage = "Max participants is required")]
+        [Range(1, int.MaxValue, ErrorMessage = "Max participants must be at least 1")]
+        public int MaxParticipants { get; set; }
     }
 }
