@@ -1,4 +1,6 @@
-﻿@{
+﻿@model H4G_Project.Models.User
+
+@{
     ViewData["Title"] = "User Calendar";
     Layout = "~/Views/Shared/_Member.cshtml";
     var successMessage = TempData["SuccessMessage"] as string;
@@ -11,7 +13,22 @@
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.min.css" rel="stylesheet" />
 
 <div class="container mt-4">
-    <h3 class="mb-3">Event Calendar</h3>
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <h3 class="mb-0">Event Calendar</h3>
+        </div>
+        <div class="col-md-4 text-right">
+            @if (Model?.Role?.ToLower() == "participant")
+            {
+                <div class="card">
+                    <div class="card-body py-2">
+                        <small class="text-muted">Your Engagement Type:</small><br>
+                        <span class="badge badge-info">@(Model.EngagementType ?? "Ad hoc engagement")</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
     <div id="calendar"></div>
 </div>
 

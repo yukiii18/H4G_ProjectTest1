@@ -22,5 +22,9 @@ namespace H4G_Project.Models
         [Display(Name = "Role")]
         [Required]
         public string? Role { get; set; } = string.Empty;
+
+        [FirestoreProperty]
+        [Display(Name = "Engagement Type")]
+        public string? EngagementType { get; set; } = "Ad hoc engagement"; // Default engagement type
     }
 }

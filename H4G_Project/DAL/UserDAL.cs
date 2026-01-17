@@ -66,7 +66,8 @@ namespace H4G_Project.DAL
                 {
                     { "Username", user.Username },
                     { "Email", user.Email },
-                    { "Role", user.Role }
+                    { "Role", user.Role },
+                    { "EngagementType", user.EngagementType ?? "Ad hoc engagement" } // Default engagement type
                 };
 
                 await db.Collection("users").AddAsync(userData);
@@ -116,6 +117,31 @@ namespace H4G_Project.DAL
             catch (Exception ex)
             {
                 Console.WriteLine($"Error deleting user: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Update user engagement type
+        public async Task<bool> UpdateEngagementType(string email, string engagementType)
+        {
+            try
+            {
+                CollectionReference usersRef = db.Collection("users");
+                Query query = usersRef.WhereEqualTo("Email", email);
+                QuerySnapshot snapshot = await query.GetSnapshotAsync();
+
+                if (snapshot.Documents.Count > 0)
+                {
+                    DocumentSnapshot doc = snapshot.Documents[0];
+                    await doc.Reference.UpdateAsync("EngagementType", engagementType);
+                    return true;
+                }
+
+                return false; // User not found
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating engagement type: {ex.Message}");
                 return false;
             }
         }
