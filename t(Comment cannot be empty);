@@ -1,0 +1,139 @@
+[33mcommit c046eb9a5d5e8439c7ad7e6da412618e4e57ebbe[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mforum[m[33m)[m
+Author: Xin Yin <s10243745@connect.np.edu.sg>
+Date:   Sat Jan 17 17:01:12 2026 +0800
+
+    [Add] forum for participants and staff
+
+[33mcommit 3420acf89437eda0860718a96bb3401791fe79ae[m[33m ([m[1;32mmaster[m[33m)[m
+Merge: c497803 b38baac
+Author: Xin Yin <s10243745@connect.np.edu.sg>
+Date:   Sat Jan 17 15:39:06 2026 +0800
+
+    Merge branch 'master' of https://github.com/HJY0315/H4G_Project
+
+[33mcommit c497803cc99632d8f8c3ecfd812eb7e679573b18[m[33m ([m[1;31morigin/test[m[33m)[m
+Author: Xin Yin <s10243745@connect.np.edu.sg>
+Date:   Sat Jan 17 15:36:26 2026 +0800
+
+    Added new fields to create event, except photo
+
+[33mcommit b38baacbba0159574a5e678d4b400e31d42312d6[m
+Author: Clarice Ong <clariceong50@gmail.com>
+Date:   Sat Jan 17 15:28:07 2026 +0800
+
+    clean up AddUser.cshtml
+
+[33mcommit 62962194aec48a6ac7ab6cdaae404d6fba3aa690[m
+Author: Clarice Ong <clariceong50@gmail.com>
+Date:   Sat Jan 17 03:20:37 2026 +0800
+
+    Firebase Authentication login and signup
+
+[33mcommit 29e47e0de3f9e6ae9516ec858fb3624661ff01ad[m
+Author: yukiii18 <110827731+yukiii18@users.noreply.github.com>
+Date:   Sat Jan 17 02:07:05 2026 +0800
+
+    Changed sign up form to application form for "potential" clients + Added a 'View Application' tab for Staff
+
+[33mcommit 8800d36261eccc2a9fac44f4625b91f73fc3e0c6[m
+Author: yukiii18 <110827731+yukiii18@users.noreply.github.com>
+Date:   Fri Jan 16 20:22:41 2026 +0800
+
+    Implemented base code for event listing + viewing of individual event details + google translate function
+
+[33mcommit 7fb113367692aecedd69e18545fd6a76670b3ffe[m
+Merge: 52401d2 76f8160
+Author: yukiii18 <110827731+yukiii18@users.noreply.github.com>
+Date:   Fri Jan 16 17:09:43 2026 +0800
+
+    Merge branch 'master' of https://github.com/HJY0315/H4G_Project
+
+[33mcommit 76f816058f1b0828b8930b39ce5071d5bfd6e6a8[m
+Author: Clarice Ong <clariceong50@gmail.com>
+Date:   Fri Jan 16 17:07:58 2026 +0800
+
+    added reports of event signups in Staff view
+
+[33mcommit 52401d2b89f2b51cdef0a59ceff86575684b5257[m
+Merge: a2bc640 e36ff5a
+Author: yukiii18 <110827731+yukiii18@users.noreply.github.com>
+Date:   Fri Jan 16 16:47:03 2026 +0800
+
+    Merge branch 'master' of https://github.com/HJY0315/H4G_Project
+
+[33mcommit a2bc6409c33b4e9ad1365af153df77479de5a3d6[m
+Author: yukiii18 <110827731+yukiii18@users.noreply.github.com>
+Date:   Fri Jan 16 16:45:29 2026 +0800
+
+    [Fix] New User's Role doesn't get captured
+
+[33mcommit e36ff5ae4233fde24326a08af8ac24783c311649[m
+Author: HJY0315 <117621210+HJY0315@users.noreply.github.com>
+Date:   Fri Jan 16 13:32:11 2026 +0800
+
+    Implement participant and volunteer form registration.
+    User's role will be automatically detected and respective form will be rendered out when the user trying to sign up for event.
+    Participant will be required to make payment after they fill up the form to successfully register for the event.
+    Volunteer's sign up request will be sent to database immediate for further staff's review without any other charges.
+
+[33mcommit 038b152427fdc00ce5bd74e6c539101a5c2cd897[m
+Author: yukiii18 <110827731+yukiii18@users.noreply.github.com>
+Date:   Thu Jan 15 23:51:43 2026 +0800
+
+    Added new field to store "Role"
+
+[33mcommit a907450677191c9ea1d00e67bfda4f1bc535c014[m
+Author: Xin Yin <s10243745@connect.np.edu.sg>
+Date:   Thu Jan 15 21:59:22 2026 +0800
+
+    [Fix] Events doenst show up on calendar due to formatting issues between firebase and code
+
+[33mcommit e46affb047c5e10daa8adb4c4667c9f40fe92e4f[m
+Author: Xin Yin <s10243745@connect.np.edu.sg>
+Date:   Thu Jan 15 21:51:53 2026 +0800
+
+    Add Staff create event function, show registration form when participant click on calendar event.
+
+[33mcommit 2d24683534a964c4ec816086b934c9d0c3926592[m
+Merge: b861e71 7fbf704
+Author: yukiii18 <110827731+yukiii18@users.noreply.github.com>
+Date:   Thu Jan 15 01:15:15 2026 +0800
+
+    Merge branch 'master' of https://github.com/HJY0315/H4G_Project
+
+[33mcommit b861e716439f46dfb390958744eaf47c493461ca[m
+Author: yukiii18 <110827731+yukiii18@users.noreply.github.com>
+Date:   Thu Jan 15 01:14:42 2026 +0800
+
+    created new collection of staffs + made changes to staff views & nav bar + made a staff creation view
+    (staff LastDateOfService field is still WIP)
+
+[33mcommit 7fbf704d6bbe9aacfbd88bbc4fbb7aaf1ccfab75[m
+Author: Xin Yin <s10243745@connect.np.edu.sg>
+Date:   Wed Jan 14 23:22:33 2026 +0800
+
+    Added DAL to retrieve events data from firebase, populate events in calendar
+
+[33mcommit af3b6dfd1b0e85e0780fc840594e049c469918a3[m
+Author: Xin Yin <s10243745@connect.np.edu.sg>
+Date:   Wed Jan 14 22:33:47 2026 +0800
+
+    Add calendar base template
+
+[33mcommit e1bbf6a3542dddaea237a71c92646c04655ab6b1[m
+Author: yukiii18 <110827731+yukiii18@users.noreply.github.com>
+Date:   Wed Jan 14 19:25:07 2026 +0800
+
+    cleaning up of code such that only login/create new user pages are available + set up db + fixed the create new user/login pages for members
+
+[33mcommit a8560fa81166970e8e637edb412e16aaa2fefc9e[m
+Author: HJY0315 <117621210+HJY0315@users.noreply.github.com>
+Date:   Tue Jan 13 03:02:13 2026 +0800
+
+    Add project files.
+
+[33mcommit e16a20b363c25e1ae566c15d070fb075c685a1eb[m
+Author: HJY0315 <117621210+HJY0315@users.noreply.github.com>
+Date:   Tue Jan 13 03:02:10 2026 +0800
+
+    Add .gitattributes and .gitignore.

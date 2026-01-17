@@ -9,6 +9,8 @@ namespace H4G_Project.Controllers
     public class UserController : Controller
     {
         private readonly UserDAL _userContext = new UserDAL();
+        private readonly EventsDAL _eventsDAL = new EventsDAL();
+
 
         // ===============================
         // DASHBOARD
@@ -202,5 +204,45 @@ namespace H4G_Project.Controllers
             HttpContext.Session.Clear();
             return RedirectToAction("Index", "Home");
         }
+
+        // ===============================
+        // VIEW ALL EVENTS
+        // ===============================
+        [HttpGet]
+        public async Task<IActionResult> ViewAllEvents()
+        {
+            string? userEmail = HttpContext.Session.GetString("UserEmail");
+            if (string.IsNullOrEmpty(userEmail))
+                return RedirectToAction("Index", "Home");
+
+            // Get only events user is registered for
+            var events = await _eventsDAL.GetEventsByUserEmail(userEmail);
+
+            return View(events);
+        }
+
+        // Comments Section
+
+        [HttpPost]
+        public async Task<IActionResult> AddComment(string eventId, string comment)
+        {
+            string username = HttpContext.Session.GetString("Username") ?? "Anonymous";
+            string email = HttpContext.Session.GetString("UserEmail") ?? "";
+            string role = HttpContext.Session.GetString("UserRole") ?? "";
+
+            if (string.IsNullOrEmpty(comment))
+                return BadRequest("Comment cannot be empty");
+
+            bool success = await _eventsDAL.AddComment(eventId, username, email, comment, role);
+
+            if (success)
+                return RedirectToAction("ViewAllEvents");
+
+            return BadRequest("Failed to add comment");
+        }
+
+
+
+
     }
 }

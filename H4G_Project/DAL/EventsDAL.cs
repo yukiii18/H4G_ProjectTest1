@@ -89,6 +89,48 @@ namespace H4G_Project.DAL
             return events;
         }
 
+        public async Task<List<Event>> GetEventsByUserEmail(string userEmail)
+        {
+            // 1. Get all registrations for this user
+            CollectionReference regRef = db.Collection("eventRegistrations");
+            QuerySnapshot regSnapshot = await regRef.WhereEqualTo("email", userEmail).GetSnapshotAsync();
+
+            List<string> registeredEventNames = new();
+            foreach (var doc in regSnapshot.Documents)
+            {
+                if (doc.Exists)
+                {
+                    var data = doc.ToDictionary();
+                    if (data.ContainsKey("eventName"))
+                        registeredEventNames.Add(data["eventName"].ToString());
+                }
+            }
+
+            // 2. Get all events
+            CollectionReference eventsRef = db.Collection("events");
+            QuerySnapshot eventsSnapshot = await eventsRef.GetSnapshotAsync();
+
+            List<Event> events = new();
+            foreach (var doc in eventsSnapshot.Documents)
+            {
+                if (doc.Exists)
+                {
+                    Event ev = doc.ConvertTo<Event>();
+                    ev.Id = doc.Id;
+
+                    // Only include events the user registered for
+                    if (registeredEventNames.Contains(ev.Name))
+                        events.Add(ev);
+                }
+            }
+
+            // Sort by Start date ascending
+            events.Sort((a, b) => a.Start.ToDateTime().CompareTo(b.Start.ToDateTime()));
+
+            return events;
+        }
+
+
         /*
         public async Task<Event> ExtractEventByID(string eid)
         {
@@ -238,5 +280,75 @@ namespace H4G_Project.DAL
                 return false;
             }
         }
+
+
+        // Add a comment to an event
+        public async Task<bool> AddComment(string eventId, string username, string email, string comment, string role)
+        {
+            try
+            {
+                var commentData = new Dictionary<string, object>
+        {
+            { "username", username },
+            { "email", email }, // store email too
+            { "comment", comment },
+            { "role", role },
+            { "timestamp", Timestamp.FromDateTime(DateTime.UtcNow) }
+        };
+
+                await db.Collection("events")
+                        .Document(eventId)
+                        .Collection("comments")
+                        .AddAsync(commentData);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding comment: {ex.Message}");
+                return false;
+            }
+        }
+
+
+        // Get comments for an event (role is stored in the comment document)
+        public async Task<List<(string username, string role, string comment)>> GetComments(string eventId)
+        {
+            var comments = new List<(string username, string role, string comment)>();
+
+            try
+            {
+                var snapshot = await db.Collection("events")
+                                       .Document(eventId)
+                                       .Collection("comments")
+                                       .OrderBy("timestamp")
+                                       .GetSnapshotAsync();
+
+                foreach (var doc in snapshot.Documents)
+                {
+                    if (doc.Exists)
+                    {
+                        var data = doc.ToDictionary();
+                        string username = data.ContainsKey("username") ? data["username"].ToString() : "Anonymous";
+                        string comment = data.ContainsKey("comment") ? data["comment"].ToString() : "";
+                        string role = data.ContainsKey("role") ? data["role"].ToString() : "";
+
+                        comments.Add((username, role, comment));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting comments: {ex.Message}");
+            }
+
+            return comments;
+        }
+
+
+
+
+
+
     }
 }

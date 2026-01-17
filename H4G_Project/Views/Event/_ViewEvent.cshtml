@@ -1,63 +1,43 @@
-@model dynamic
-<!DOCTYPE html>
-<html lang="en">
+@model List<H4G_Project.Models.Event>
 
-<head>
-    <link rel="stylesheet" href="~/css/event.css">
-    <script src="/js/forum.js"></script>
+@{
+    ViewData["Title"] = "All Events";
+    Layout = "~/Views/Shared/_Member.cshtml";
+}
 
-    <link href="https://unpkg.com/nes.css/css/nes.css" rel="stylesheet" />
-    <script src="/js/script.js"></script>
-    <link rel="stylesheet" href="/css/bttBtn.css">
-    <link rel="stylesheet" href="/css/pingu.css">
-    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-</head>
+<div class="container mt-4">
+    <h3 class="mb-4">All Events</h3>
 
-<body>
-    <style>
-        .column {
-            float: left;
-            padding: 10px;
-        }
-
-        .column.left.side {
-            width: 80%
-        }
-
-        .column.right.side {
-            width: 20%
-        }
-    </style>
-    <div class="gif-container">
-        <div class="gif-text">Use me to translate!</div>
-        <img src="/images/penguin.gif" style="max-width:50%; object-fit:contain; height: 10em;" alt="Your GIF">
-    </div>
-    <div id="google_translate_element"></div><br /><br />
-    <h2>List of Events</h2>
-    <div class="column left side" style="height:100%; overflow:hidden;">
-        <div class="container" style="height:700px; overflow-y:auto;">
-            <div class="row">
-                @foreach (Event events in Model.Event)
-                {
-                    <div class="col-md-4">
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <p class="card-title">
-                                    <a asp-controller="Event" asp-action="DetailedIndex" asp-route-eventId="@events.eventID"
-                                        class="card-title">
-                                        <h5>@events.Name</h5>
-                                    </a>
-                                </p>
-                                <p class="card-text">
-                                    <img src="@Url.Content(events.eventPhoto)" alt="Event Photo" height="200" width="100%">
-                                </p>
-
-                            </div>
+    @if (Model == null || !Model.Any())
+    {
+        <p>No events found.</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var ev in Model.OrderBy(e => e.Start.ToDateTime()))
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@ev.Name</h5>
+                            <p class="card-text">
+                                @if (!string.IsNullOrEmpty(ev.Details))
+                                {
+                                    <strong>Details:</strong> @ev.Details <br />
+                                }
+                                <strong>Start:</strong> @ev.Start.ToDateTime().ToString("dd MMM yyyy HH:mm") <br />
+                                <strong>End:</strong> @(ev.End != null ? ev.End?.ToDateTime().ToString("dd MMM yyyy HH:mm") : "-") <br />
+                                <strong>Registration Due:</strong> @(ev.RegistrationDueDate != null ? ev.RegistrationDueDate.ToDateTime().ToString("dd MMM yyyy") : "-") <br />
+                                <strong>Max Participants:</strong> @(ev.MaxParticipants != null ? ev.MaxParticipants.ToString() : "-")
+                            </p>
                         </div>
                     </div>
-                }
-            </div>
+                </div>
+            }
         </div>
-    </div>
+    }
+</div>
 
-</body>
+@section Scripts {
+}

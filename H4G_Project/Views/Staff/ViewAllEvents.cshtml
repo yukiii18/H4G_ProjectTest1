@@ -1,0 +1,61 @@
+﻿@model List<H4G_Project.Models.Event>
+
+@{
+    ViewData["Title"] = "All Events";
+    Layout = "~/Views/Shared/_Staff.cshtml";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-4">All Events</h3>
+
+    <div class="row">
+        @if (Model != null && Model.Count > 0)
+        {
+            foreach (var ev in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        @* Event photo if exists *@
+                        @if (!string.IsNullOrEmpty(ev.eventPhoto))
+                        {
+                            <img src="@ev.eventPhoto" class="card-img-top" alt="@ev.Name" style="height:200px; object-fit:cover;" />
+                        }
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@ev.Name</h5>
+
+                            @if (!string.IsNullOrEmpty(ev.Details))
+                            {
+                                <p class="card-text">@ev.Details</p>
+                            }
+
+                            <ul class="list-unstyled">
+                                <li><strong>Start:</strong> @ev.Start.ToDateTime().ToString("dd MMM yyyy HH:mm")</li>
+                                @if (ev.End != null)
+                                {
+                                    <li><strong>End:</strong> @ev.End?.ToDateTime().ToString("dd MMM yyyy HH:mm")</li>
+                                }
+                                @if (ev.RegistrationDueDate != null)
+                                {
+                                    <li><strong>Registration Due:</strong> @ev.RegistrationDueDate.ToDateTime().ToString("dd MMM yyyy")</li>
+                                }
+                                <li><strong>Max Participants:</strong> @ev.MaxParticipants</li>
+                            </ul>
+
+                            <div class="mt-auto">
+                                <a href="@Url.Action("EditEvent", "Staff", new { id = ev.Id })" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="@Url.Action("DeleteEvent", "Staff", new { id = ev.Id })" class="btn btn-danger btn-sm">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-info">No events found.</div>
+            </div>
+        }
+    </div>
+</div>
