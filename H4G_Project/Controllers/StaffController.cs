@@ -174,6 +174,7 @@ namespace H4G_Project.Controllers
             string username = form["Username"];
             string email = form["Email"];
             string role = form["Role"];
+            string password = form["Password"]; // Get password from form
             string applicationId = form["ApplicationId"]; // Hidden field from the form
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(role))
@@ -182,8 +183,11 @@ namespace H4G_Project.Controllers
                 return View();
             }
 
-            // Generate a random temporary password
-            string temporaryPassword = GenerateRandomPassword();
+            // Determine if this is from application approval or manual creation
+            bool isFromApplication = !string.IsNullOrEmpty(applicationId);
+            
+            // Use provided password or generate random one if empty
+            string finalPassword = string.IsNullOrEmpty(password) ? GenerateRandomPassword() : password;
 
             try
             {
@@ -191,7 +195,7 @@ namespace H4G_Project.Controllers
                 var userRecord = await FirebaseAuth.DefaultInstance.CreateUserAsync(new UserRecordArgs
                 {
                     Email = email,
-                    Password = temporaryPassword
+                    Password = finalPassword
                 });
 
                 await _userContext.AddUser(new User
@@ -207,11 +211,21 @@ namespace H4G_Project.Controllers
                     await _applicationContext.UpdateApplicationStatus(applicationId, "Approved");
                 }
 
-                // Pass the generated password to the view for display
-                TempData["SuccessMessage"] = $"User account created successfully for {username}.";
-                TempData["GeneratedPassword"] = temporaryPassword;
-                TempData["UserEmail"] = email;
-                return View("UserCreated");
+                // Show confirmation page only if password was auto-generated (from application or manual with blank password)
+                if (string.IsNullOrEmpty(form["Password"]))
+                {
+                    // Pass the generated password to the view for display
+                    TempData["SuccessMessage"] = $"User account created successfully for {username}.";
+                    TempData["GeneratedPassword"] = finalPassword;
+                    TempData["UserEmail"] = email;
+                    return View("UserCreated");
+                }
+                else
+                {
+                    // Manual password was provided - just show success message and redirect
+                    TempData["SuccessMessage"] = $"User account created successfully for {username} with custom password.";
+                    return RedirectToAction("AddUser");
+                }
             }
             catch (FirebaseAuthException ex)
             {
@@ -310,6 +324,48 @@ namespace H4G_Project.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        // ===============================
+        // MANAGE PARTICIPANT ENGAGEMENT
+        // ===============================
+        [HttpGet]
+        public async Task<IActionResult> ManageEngagement()
+        {
+            var allUsers = await _userContext.GetAllUsers();
+            // Filter to only show participants
+            var participants = allUsers.Where(u => u.Role?.ToLower() == "participant").ToList();
+            return View(participants);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateEngagement(string email, string engagementType)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(engagementType))
+            {
+                TempData["ErrorMessage"] = "Email and engagement type are required.";
+                return RedirectToAction("ManageEngagement");
+            }
+
+            try
+            {
+                bool success = await _userContext.UpdateEngagementType(email, engagementType);
+                
+                if (success)
+                {
+                    TempData["SuccessMessage"] = $"Engagement type updated successfully for {email}.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to update engagement type. User not found.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error updating engagement type: {ex.Message}";
+            }
+
+            return RedirectToAction("ManageEngagement");
         }
     }
 }
