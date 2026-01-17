@@ -35,6 +35,19 @@ namespace H4G_Project.Models
         public string PhoneNumber { get; set; }
 
         // Volunteer-specific fields
+        [FirestoreProperty("nricLast4")]
+        public string NricLast4 { get; set; }
+
+        [FirestoreProperty("gender")]
+        public string Gender { get; set; }
+
+        [FirestoreProperty("dateOfBirth")]
+        public string DateOfBirth { get; set; }
+
+        [FirestoreProperty("citizenshipType")]
+        public string CitizenshipType { get; set; }
+
+        // Legacy volunteer fields (keeping for backward compatibility)
         [FirestoreProperty("preferredRole")]
         public string PreferredRole { get; set; }
 
@@ -47,6 +60,9 @@ namespace H4G_Project.Models
 
         [FirestoreProperty("emergencyContact")]
         public string EmergencyContact { get; set; }
+
+        [FirestoreProperty("emergencyContactName")]
+        public string EmergencyContactName { get; set; }
 
         [FirestoreProperty("paymentStatus")]
         public string PaymentStatus { get; set; } // "Pending", "Completed"

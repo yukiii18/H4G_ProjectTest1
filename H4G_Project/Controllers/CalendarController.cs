@@ -72,10 +72,17 @@ namespace H4G_Project.Controllers
                     FullName = request.FullName,
                     Email = request.Email,
                     PhoneNumber = request.PhoneNumber,
+                    NricLast4 = request.NricLast4,
+                    Gender = request.Gender,
+                    DateOfBirth = request.DateOfBirth,
+                    CitizenshipType = request.CitizenshipType,
+                    // Legacy fields (keeping for backward compatibility)
                     PreferredRole = request.PreferredRole,
                     Skills = request.Skills,
+                    // Participant fields
                     DietaryRequirements = request.DietaryRequirements,
                     EmergencyContact = request.EmergencyContact,
+                    EmergencyContactName = request.EmergencyContactName,
                     PaymentStatus = "Pending",
                     PaymentAmount = request.Role == "Volunteer" ? 0.0 : 50.0,
                     RegistrationDate = Timestamp.FromDateTime(DateTime.UtcNow)
@@ -166,10 +173,21 @@ namespace H4G_Project.Controllers
         public string FullName { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
+        
+        // New volunteer fields
+        public string NricLast4 { get; set; }
+        public string Gender { get; set; }
+        public string DateOfBirth { get; set; }
+        public string CitizenshipType { get; set; }
+        
+        // Legacy volunteer fields (keeping for backward compatibility)
         public string PreferredRole { get; set; }
         public string Skills { get; set; }
+        
+        // Participant fields
         public string DietaryRequirements { get; set; }
         public string EmergencyContact { get; set; }
+        public string EmergencyContactName { get; set; }
     }
 
     public class PaymentConfirmationRequest

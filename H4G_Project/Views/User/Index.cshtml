@@ -128,23 +128,90 @@
                     // Step 2: Show registration form based on role
                     const volunteerFields = role === 'Volunteer' ? `
                         <div class="form-group text-left mt-2">
-                            <label>Preferred Role/Task</label>
-                            <textarea id="PreferredRole" class="form-control" rows="2" placeholder="e.g., Setup, Registration desk, Cleanup, Photography"></textarea>
+                            <label>Last 4 characters of NRIC *</label>
+                            <input type="text" id="NricLast4" class="form-control" maxlength="4" placeholder="e.g., 123A" required />
+                            <small class="text-muted">Enter last 4 characters (e.g., 123A)</small>
                         </div>
                         <div class="form-group text-left mt-2">
-                            <label>Skills/Experience</label>
-                            <textarea id="Skills" class="form-control" rows="2" placeholder="e.g., Event management, First aid"></textarea>
+                            <label>Gender *</label>
+                            <select id="Gender" class="form-control" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group text-left mt-2">
+                            <label>Date of Birth *</label>
+                            <input type="date" id="DateOfBirth" class="form-control" required />
+                        </div>
+                        <div class="form-group text-left mt-2">
+                            <label>Mobile Number *</label>
+                            <input type="tel" id="MobileNumber" class="form-control" maxlength="8" placeholder="12345678" required />
+                            <small class="text-muted">8 digits only</small>
+                        </div>
+                        <div class="form-group text-left mt-2">
+                            <label>Citizenship Type *</label>
+                            <select id="CitizenshipType" class="form-control" required>
+                                <option value="">Select Citizenship Type</option>
+                                <option value="Singaporean">Singaporean</option>
+                                <option value="Singapore Permanent Resident">Singapore Permanent Resident</option>
+                                <option value="Long Term Visit Pass">Long Term Visit Pass</option>
+                                <option value="Employment Pass/S Pass">Employment Pass/S Pass</option>
+                            </select>
+                        </div>
+                        <div class="form-group text-left mt-3">
+                            <h6><strong>Declaration & Consent (All Required) *</strong></h6>
+                            <div class="form-check text-left mt-2">
+                                <input type="checkbox" id="SecurityScreening" class="form-check-input" required />
+                                <label class="form-check-label" for="SecurityScreening">
+                                    <strong>Security Screening *:</strong> I agree to give consent for MINDS to forward my particulars to the Ministry of Social and Family Development (MSF) for security screening in protection of the safety and wellbeing of our clients should I volunteer with MINDS.
+                                </label>
+                            </div>
+                            <div class="form-check text-left mt-2">
+                                <input type="checkbox" id="Confidentiality" class="form-check-input" required />
+                                <label class="form-check-label" for="Confidentiality">
+                                    <strong>Confidentiality *:</strong> I agree to maintain strict confidentiality pertaining to client information and all matters during the course of my volunteering activities.
+                                </label>
+                            </div>
+                            <div class="form-check text-left mt-2">
+                                <input type="checkbox" id="CodeOfConduct" class="form-check-input" required />
+                                <label class="form-check-label" for="CodeOfConduct">
+                                    <strong>Volunteer Code of Conduct *:</strong> I agree to the <a href="https://drive.google.com/file/d/1L6IqfJdpk-7WszKwaFpxlmNHVegqx0xW/view" target="_blank">Volunteer Code of Conduct</a> and agree to abide by the conditions for my volunteering activity.
+                                </label>
+                            </div>
+                            <div class="form-check text-left mt-2">
+                                <input type="checkbox" id="PDPA" class="form-check-input" required />
+                                <label class="form-check-label" for="PDPA">
+                                    <strong>Personal Data Protection Act (PDPA) *:</strong> I consent to MINDS collecting, using, disclosing and/or processing my personal data for volunteer service administration and related activities.
+                                </label>
+                            </div>
+                            <small class="text-danger mt-2" id="declarationError" style="display:none;">Please agree to all declarations to proceed</small>
                         </div>
                     ` : '';
 
                     const participantFields = role === 'Participant' ? `
                         <div class="form-group text-left mt-2">
+                            <label>Phone Number</label>
+                            <input type="tel" id="PhoneNumber" class="form-control" 
+                                   placeholder="12345678" maxlength="8" />
+                            <small class="text-muted">Optional: 8 digits</small>
+                            <small class="text-danger" id="phoneError" style="display:none;">Please enter exactly 8 digits only</small>
+                        </div>
+                        <div class="form-group text-left mt-2">
                             <label>Dietary Requirements</label>
                             <textarea id="DietaryRequirements" class="form-control" rows="2" placeholder="e.g., Vegetarian, Allergies"></textarea>
                         </div>
                         <div class="form-group text-left mt-2">
-                            <label>Emergency Contact</label>
-                            <input type="text" id="EmergencyContact" class="form-control" placeholder="Name and phone number" />
+                            <label>Emergency Contact Name</label>
+                            <input type="text" id="EmergencyContactName" class="form-control" placeholder="Full name of emergency contact" />
+                        </div>
+                        <div class="form-group text-left mt-2">
+                            <label>Emergency Contact Number</label>
+                            <input type="tel" id="EmergencyContactNumber" class="form-control" 
+                                   placeholder="12345678" maxlength="8" />
+                            <small class="text-muted">8 digits only</small>
+                            <small class="text-danger" id="emergencyContactError" style="display:none;">Please enter exactly 8 digits only</small>
                         </div>
                     ` : '';
 
@@ -179,16 +246,8 @@
 
                                     <div class="form-group text-left mt-2">
                                         <label>Email *</label>
-                                        <input type="email" id="Email" class="form-control" required />
-                                        <small class="text-danger" id="emailError" style="display:none;">Please enter a valid email address</small>
-                                    </div>
-
-                                    <div class="form-group text-left mt-2">
-                                        <label>Phone Number</label>
-                                        <input type="tel" id="PhoneNumber" class="form-control" 
-                                               placeholder="12345678" maxlength="8" />
-                                        <small class="text-muted">Optional: 8 digits</small>
-                                        <small class="text-danger" id="phoneError" style="display:none;">Please enter exactly 8 digits only</small>
+                                        <input type="email" id="Email" class="form-control" value="@Model.Email" readonly required />
+                                        <small class="text-muted">Pre-filled from your account</small>
                                     </div>
 
                                     ${volunteerFields}
@@ -204,23 +263,8 @@
                         allowOutsideClick: false,
                         didOpen: () => {
                             // Add real-time validation
-                            const emailInput = document.getElementById('Email');
-                            const emailError = document.getElementById('emailError');
                             const nameInput = document.getElementById('FullName');
                             const nameError = document.getElementById('nameError');
-                            const phoneInput = document.getElementById('PhoneNumber');
-                            const phoneError = document.getElementById('phoneError');
-
-                            emailInput.addEventListener('blur', function() {
-                                // Simple email validation - just check for @@ and .
-                                if (this.value && (!this.value.includes('@@') || !this.value.includes('.'))) {
-                                    emailError.style.display = 'block';
-                                    this.classList.add('is-invalid');
-                                } else {
-                                    emailError.style.display = 'none';
-                                    this.classList.remove('is-invalid');
-                                }
-                            });
 
                             nameInput.addEventListener('blur', function() {
                                 if (!this.value.trim()) {
@@ -232,22 +276,78 @@
                                 }
                             });
 
-                            phoneInput.addEventListener('blur', function() {
-                                // Phone validation: exactly 8 digits (numbers only)
-                                const phoneRegex = /^\d{8}$/;
-                                if (this.value && !phoneRegex.test(this.value)) {
-                                    phoneError.style.display = 'block';
-                                    this.classList.add('is-invalid');
-                                } else {
-                                    phoneError.style.display = 'none';
-                                    this.classList.remove('is-invalid');
-                                }
-                            });
+                            // Add validation for volunteer mobile number and declarations
+                            if (role === 'Volunteer') {
+                                const mobileInput = document.getElementById('MobileNumber');
+                                const mobileError = document.createElement('small');
+                                mobileError.className = 'text-danger';
+                                mobileError.style.display = 'none';
+                                mobileError.textContent = 'Please enter exactly 8 digits only';
+                                mobileInput.parentNode.appendChild(mobileError);
+
+                                mobileInput.addEventListener('blur', function() {
+                                    const mobileRegex = /^\d{8}$/;
+                                    if (this.value && !mobileRegex.test(this.value)) {
+                                        mobileError.style.display = 'block';
+                                        this.classList.add('is-invalid');
+                                    } else {
+                                        mobileError.style.display = 'none';
+                                        this.classList.remove('is-invalid');
+                                    }
+                                });
+
+                                // Add real-time validation for declarations
+                                const declarationCheckboxes = ['SecurityScreening', 'Confidentiality', 'CodeOfConduct', 'PDPA'];
+                                const declarationError = document.getElementById('declarationError');
+                                
+                                declarationCheckboxes.forEach(id => {
+                                    const checkbox = document.getElementById(id);
+                                    checkbox.addEventListener('change', function() {
+                                        const allChecked = declarationCheckboxes.every(checkId => 
+                                            document.getElementById(checkId).checked
+                                        );
+                                        
+                                        if (allChecked) {
+                                            declarationError.style.display = 'none';
+                                        }
+                                    });
+                                });
+                            } else if (role === 'Participant') {
+                                // Add phone validation for participants
+                                const phoneInput = document.getElementById('PhoneNumber');
+                                const phoneError = document.getElementById('phoneError');
+
+                                phoneInput.addEventListener('blur', function() {
+                                    // Phone validation: exactly 8 digits (numbers only)
+                                    const phoneRegex = /^\d{8}$/;
+                                    if (this.value && !phoneRegex.test(this.value)) {
+                                        phoneError.style.display = 'block';
+                                        this.classList.add('is-invalid');
+                                    } else {
+                                        phoneError.style.display = 'none';
+                                        this.classList.remove('is-invalid');
+                                    }
+                                });
+
+                                // Add validation for emergency contact number
+                                const emergencyContactInput = document.getElementById('EmergencyContactNumber');
+                                const emergencyContactError = document.getElementById('emergencyContactError');
+
+                                emergencyContactInput.addEventListener('blur', function() {
+                                    const phoneRegex = /^\d{8}$/;
+                                    if (this.value && !phoneRegex.test(this.value)) {
+                                        emergencyContactError.style.display = 'block';
+                                        this.classList.add('is-invalid');
+                                    } else {
+                                        emergencyContactError.style.display = 'none';
+                                        this.classList.remove('is-invalid');
+                                    }
+                                });
+                            }
                         },
                         preConfirm: () => {
                             const fullName = document.getElementById('FullName').value.trim();
                             const email = document.getElementById('Email').value.trim();
-                            const phoneNumber = document.getElementById('PhoneNumber').value.trim();
 
                             // Validate full name
                             if (!fullName) {
@@ -255,31 +355,116 @@
                                 return false;
                             }
 
-                            // Validate email format - simple check
-                            if (!email || !email.includes('@@') || !email.includes('.')) {
-                                Swal.showValidationMessage('Please enter a valid email address (e.g., name@@example.com)');
-                                return false;
-                            }
+                            // Email is pre-filled and readonly, so no validation needed
 
-                            // Validate phone number if provided - exactly 8 digits (numbers only)
-                            const phoneRegex = /^\d{8}$/;
-                            if (phoneNumber && !phoneRegex.test(phoneNumber)) {
-                                Swal.showValidationMessage('Please enter a valid phone number (8 digits only)');
-                                return false;
-                            }
+                            // Additional validation for volunteers
+                            if (role === 'Volunteer') {
+                                const nricLast4 = document.getElementById('NricLast4').value.trim();
+                                const gender = document.getElementById('Gender').value;
+                                const dateOfBirth = document.getElementById('DateOfBirth').value;
+                                const mobileNumber = document.getElementById('MobileNumber').value.trim();
+                                const citizenshipType = document.getElementById('CitizenshipType').value;
+                                const securityScreening = document.getElementById('SecurityScreening').checked;
+                                const confidentiality = document.getElementById('Confidentiality').checked;
+                                const codeOfConduct = document.getElementById('CodeOfConduct').checked;
+                                const pdpa = document.getElementById('PDPA').checked;
 
-                            return {
-                                eventId: eventId,
-                                eventName: eventTitle,
-                                role: role,
-                                fullName: fullName,
-                                email: email,
-                                phoneNumber: phoneNumber,
-                                preferredRole: role === 'Volunteer' ? document.getElementById('PreferredRole').value : null,
-                                skills: role === 'Volunteer' ? document.getElementById('Skills').value : null,
-                                dietaryRequirements: role === 'Participant' ? document.getElementById('DietaryRequirements').value : null,
-                                emergencyContact: role === 'Participant' ? document.getElementById('EmergencyContact').value : null
-                            };
+                                if (!nricLast4 || nricLast4.length !== 4) {
+                                    Swal.showValidationMessage('Please enter the last 4 characters of your NRIC');
+                                    return false;
+                                }
+
+                                if (!gender) {
+                                    Swal.showValidationMessage('Please select your gender');
+                                    return false;
+                                }
+
+                                if (!dateOfBirth) {
+                                    Swal.showValidationMessage('Please enter your date of birth');
+                                    return false;
+                                }
+
+                                const phoneRegex = /^\d{8}$/;
+                                if (!mobileNumber || !phoneRegex.test(mobileNumber)) {
+                                    Swal.showValidationMessage('Please enter a valid mobile number (8 digits only)');
+                                    return false;
+                                }
+
+                                if (!citizenshipType) {
+                                    Swal.showValidationMessage('Please select your citizenship type');
+                                    return false;
+                                }
+
+                                if (!securityScreening) {
+                                    Swal.showValidationMessage('Please agree to Security Screening consent');
+                                    return false;
+                                }
+
+                                if (!confidentiality) {
+                                    Swal.showValidationMessage('Please agree to Confidentiality requirements');
+                                    return false;
+                                }
+
+                                if (!codeOfConduct) {
+                                    Swal.showValidationMessage('Please agree to Volunteer Code of Conduct');
+                                    return false;
+                                }
+
+                                if (!pdpa) {
+                                    Swal.showValidationMessage('Please agree to Personal Data Protection Act (PDPA)');
+                                    return false;
+                                }
+
+                                // Note: Declaration values are not stored in database - they're just for user awareness
+                                return {
+                                    eventId: eventId,
+                                    eventName: eventTitle,
+                                    role: role,
+                                    fullName: fullName,
+                                    email: email,
+                                    phoneNumber: mobileNumber, // Use mobile number as phone number
+                                    nricLast4: nricLast4,
+                                    gender: gender,
+                                    dateOfBirth: dateOfBirth,
+                                    citizenshipType: citizenshipType,
+                                    dietaryRequirements: null,
+                                    emergencyContact: null,
+                                    emergencyContactName: null
+                                };
+                            } else {
+                                // Participant validation
+                                const phoneNumber = document.getElementById('PhoneNumber') ? document.getElementById('PhoneNumber').value.trim() : '';
+                                const emergencyContactNumber = document.getElementById('EmergencyContactNumber') ? document.getElementById('EmergencyContactNumber').value.trim() : '';
+                                
+                                // Validate phone number if provided - exactly 8 digits (numbers only)
+                                const phoneRegex = /^\d{8}$/;
+                                if (phoneNumber && !phoneRegex.test(phoneNumber)) {
+                                    Swal.showValidationMessage('Please enter a valid phone number (8 digits only)');
+                                    return false;
+                                }
+
+                                // Validate emergency contact number if provided - exactly 8 digits (numbers only)
+                                if (emergencyContactNumber && !phoneRegex.test(emergencyContactNumber)) {
+                                    Swal.showValidationMessage('Please enter a valid emergency contact number (8 digits only)');
+                                    return false;
+                                }
+
+                                return {
+                                    eventId: eventId,
+                                    eventName: eventTitle,
+                                    role: role,
+                                    fullName: fullName,
+                                    email: email,
+                                    phoneNumber: phoneNumber,
+                                    nricLast4: null,
+                                    gender: null,
+                                    dateOfBirth: null,
+                                    citizenshipType: null,
+                                    dietaryRequirements: role === 'Participant' ? document.getElementById('DietaryRequirements').value : null,
+                                    emergencyContact: role === 'Participant' ? document.getElementById('EmergencyContactNumber').value : null,
+                                    emergencyContactName: role === 'Participant' ? document.getElementById('EmergencyContactName').value : null
+                                };
+                            }
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
