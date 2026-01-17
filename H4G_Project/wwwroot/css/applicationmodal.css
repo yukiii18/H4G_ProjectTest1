@@ -1,0 +1,32 @@
+#detailsModal .modal-dialog {
+  max-width: 90%;   
+  width: 90%;
+  height: 90%;      
+}
+
+#detailsModal .modal-content {
+  height: 100%;
+}
+
+#detailsModal .modal-body {
+  height: calc(100% - 120px); /* leave space for header/footer */
+  overflow-y: auto;
+}
+
+/* Increase text sizes */
+#detailsModal .modal-title {
+  font-size: 1.8rem;
+}
+
+#detailsModal .modal-body p,
+#detailsModal .modal-body h6,
+#detailsModal .modal-footer button {
+  font-size: 1.5rem;
+  padding: 5px;
+}
+
+/* PDF viewer */
+#detailsModal iframe {
+  height: 800px;   
+  border: 2px solid #666;
+}
