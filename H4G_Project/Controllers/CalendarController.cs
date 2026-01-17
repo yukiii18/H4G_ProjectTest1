@@ -26,6 +26,28 @@ namespace H4G_Project.Controllers
             }));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetEventDetails(string id)
+        {
+            var events = await eventsDAL.GetAllEvents();
+            var eventDetails = events.FirstOrDefault(e => e.Id == id);
+
+            if (eventDetails == null)
+            {
+                return NotFound();
+            }
+
+            return Json(new
+            {
+                id = eventDetails.Id,
+                name = eventDetails.Name,
+                details = eventDetails.details,
+                eventPhoto = eventDetails.eventPhoto,
+                start = eventDetails.Start.ToDateTime().ToString("yyyy-MM-dd HH:mm"),
+                end = eventDetails.End.HasValue ? eventDetails.End.Value.ToDateTime().ToString("yyyy-MM-dd HH:mm") : null
+            });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register([FromBody] EventRegistrationRequest request)
