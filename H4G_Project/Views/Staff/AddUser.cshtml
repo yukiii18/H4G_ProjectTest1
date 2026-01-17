@@ -325,15 +325,16 @@
 
         @using (Html.BeginForm("AddUser", "Staff", FormMethod.Post))
         {
-            <p>Username : <input type="text" name="Username" placeholder="Username" required /></p>
-            <p>Email : <input type="email" name="Email" placeholder="Email" required /></p>
-            <p>Password : <input type="password" name="Password" placeholder="Password (min 6 characters)" required /></p>
+            <input type="hidden" name="ApplicationId" value="@ViewBag.ApplicationId" />
+            <p>Username : <input type="text" name="Username" placeholder="Username" value="@ViewBag.ApplicantName" required /></p>
+            <p>Email : <input type="email" name="Email" placeholder="Email" value="@ViewBag.ApplicantEmail" required /></p>
+            <p><small class="text-muted">A temporary password will be generated automatically. The user can reset it after first login.</small></p>
             <p>Role:
-                <label><input type="radio" name="Role" value="participant" required> Participant</label>
+                <label><input type="radio" name="Role" value="participant" checked required> Participant</label>
                 <label><input type="radio" name="Role" value="volunteer"> Volunteer</label>
             </p>
 
-            <input type="submit" value="Sign Up" />
+            <input type="submit" value="Create User Account" />
         }
 
     </div>

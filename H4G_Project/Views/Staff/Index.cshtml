@@ -10,6 +10,46 @@
 
 <div class="container mt-4">
 
+    <h3 class="mb-3">Staff Dashboard</h3>
+
+    <!-- Success/Error Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Delete User Section (For Testing) -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>🗑️ Delete User (Testing Only)</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/Staff/DeleteUser" onsubmit="return confirm('Are you sure you want to delete this user? This will remove them from both Authentication and Database.')">
+                        <div class="mb-3">
+                            <label for="deleteEmail" class="form-label">User Email:</label>
+                            <input type="email" class="form-control" id="deleteEmail" name="email" placeholder="Enter email to delete" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger">Delete User</button>
+                    </form>
+                    <small class="text-muted">This will delete the user from both Firebase Authentication and Firestore Database.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <h3 class="mb-3">Calendar</h3>
 
     <!-- Calendar Container -->

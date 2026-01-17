@@ -323,6 +323,11 @@
             <input type="email" id="memberEmail" placeholder="Email" required />
             <input type="password" id="memberPassword" placeholder="Password" required />
             <input type="button" value="Log In" onclick="loginUser()" />
+            <input type="button" value="Legacy Login" onclick="legacyLoginUser()" style="background-color: #ccc; margin-top: 10px;" />
+            <small style="color: #666;">Use "Legacy Login" if you have an existing account</small>
+            <div style="margin-top: 15px;">
+                <a href="/User/ResetPassword" style="color: #0082c6; text-decoration: none; font-size: 14px;">Reset Password</a>
+            </div>
         </form>
 
         <!-- Staff Login Form -->
@@ -374,6 +379,34 @@ window.loginUser = async function() {
 
         if (response.ok) window.location.href = "/User";
         else alert("Login failed: invalid user");
+    } catch (err) {
+        console.error(err);
+        alert("Login failed: " + err.message);
+    }
+}
+
+// ===============================
+// Legacy login for existing users
+// ===============================
+window.legacyLoginUser = async function() {
+    const email = document.getElementById("memberEmail").value;
+    const password = document.getElementById("memberPassword").value;
+
+    const formData = new FormData();
+    formData.append("Email", email);
+    formData.append("Password", password);
+
+    try {
+        const response = await fetch("/User/LogInUser", {
+            method: "POST",
+            body: formData
+        });
+
+        if (response.redirected) {
+            window.location.href = response.url;
+        } else {
+            alert("Login failed: invalid credentials");
+        }
     } catch (err) {
         console.error(err);
         alert("Login failed: " + err.message);

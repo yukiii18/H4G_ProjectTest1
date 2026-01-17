@@ -152,7 +152,7 @@ namespace H4G_Project.DAL
                     Dictionary<string, dynamic> documentDictionary = document.ToDictionary();
 
                     @event.name = documentDictionary["name"].ToString();
-                    @event.details = documentDictionary["details"].ToString();
+                    @event.Details = documentDictionary["details"].ToString();
                     @event.eventPhoto = documentDictionary["eventPhoto"].ToString();
 
                 }
