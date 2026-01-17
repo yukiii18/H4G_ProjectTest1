@@ -55,6 +55,7 @@
                 <th>Payment Status</th>
                 <th>Registration Date</th>
                 <th>Waitlist Status</th>
+                <th>Attendance</th>
             </tr>
         </thead>
         <tbody>
@@ -98,6 +99,16 @@
                         else
                         {
                             <span class="badge bg-secondary">-</span>
+                        }
+                    </td>
+                    <td>
+                        @if (r.Attendance)
+                        {
+                            <span class="badge bg-success">Attended</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Not Attended</span>
                         }
                     </td>
                 </tr>

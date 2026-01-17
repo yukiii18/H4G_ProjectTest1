@@ -230,6 +230,58 @@ namespace H4G_Project.DAL
             }
         }
 
+        // For Attendance
+        public async Task<List<EventRegistration>> GetRegistrationsByEventId(string eventId)
+        {
+            var snapshot = await db.Collection("eventRegistrations")
+                                   .WhereEqualTo("eventId", eventId)
+                                   .GetSnapshotAsync();
+
+            return snapshot.Documents.Select(d => d.ConvertTo<EventRegistration>()).ToList();
+        }
+
+        public async Task<Event?> GetEventById(string id)
+        {
+            var doc = await db.Collection("events").Document(id).GetSnapshotAsync();
+            return doc.Exists ? doc.ConvertTo<Event>() : null;
+        }
+
+        public async Task<bool> UpdateRegistration(EventRegistration registration)
+        {
+            try
+            {
+                var docRef = db.Collection("eventRegistrations").Document(registration.Id);
+                var updates = new Dictionary<string, object>
+                {
+                    { "attendance", registration.Attendance }
+                };
+                await docRef.UpdateAsync(updates);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating registration: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateEventQrCode(string eventId, string qrCode)
+        {
+            try
+            {
+                DocumentReference docRef = db.Collection("events").Document(eventId);
+
+                // Use SetAsync with merge option instead of UpdateAsync
+                await docRef.SetAsync(new { qrCode = qrCode }, SetOptions.MergeAll);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
         // 🔹 Get registration by ID
         public async Task<EventRegistration> GetRegistrationById(string registrationId)
         {

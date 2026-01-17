@@ -5,6 +5,10 @@ using FirebaseAdmin.Auth;
 using Google.Cloud.Firestore;
 using System.Threading.Tasks;
 using System.Linq;
+using QRCoder;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 
 namespace H4G_Project.Controllers
 {
@@ -34,6 +38,37 @@ namespace H4G_Project.Controllers
 
             return View(staff);
         }
+        // ===============================
+        // Attendance QR
+        // ===============================
+
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadEventQRCode(string eventId)
+        {
+            var events = await _eventsDAL.GetAllEvents();
+            var ev = events.FirstOrDefault(e => e.Id == eventId);
+            if (ev == null) return NotFound("Event not found");
+
+            // Ensure a stable QR code exists
+            if (string.IsNullOrEmpty(ev.QrCode))
+            {
+                ev.QrCode = $"EVENT-{ev.Id}";
+                await _eventsDAL.UpdateEventQrCode(ev.Id, ev.QrCode); // ✅ Use new method
+            }
+
+            using var qrGenerator = new QRCoder.QRCodeGenerator();
+            using var qrCodeData = qrGenerator.CreateQrCode(ev.QrCode, QRCoder.QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new QRCoder.QRCode(qrCodeData);
+            using var bitmap = qrCode.GetGraphic(20);
+
+            var stream = new MemoryStream();
+            bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+            stream.Position = 0;
+
+            return File(stream, "image/png", $"{ev.Name}-QRCode.png");
+        }
+
 
         // ===============================
         // REPORTS (FILTERABLE)
@@ -185,7 +220,7 @@ namespace H4G_Project.Controllers
 
             // Determine if this is from application approval or manual creation
             bool isFromApplication = !string.IsNullOrEmpty(applicationId);
-            
+
             // Use provided password or generate random one if empty
             string finalPassword = string.IsNullOrEmpty(password) ? GenerateRandomPassword() : password;
 
@@ -393,7 +428,7 @@ namespace H4G_Project.Controllers
             try
             {
                 bool success = await _userContext.UpdateEngagementType(email, engagementType);
-                
+
                 if (success)
                 {
                     TempData["SuccessMessage"] = $"Engagement type updated successfully for {email}.";

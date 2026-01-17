@@ -40,5 +40,9 @@ namespace H4G_Project.Models
         [Required(ErrorMessage = "Max participants is required")]
         [Range(1, int.MaxValue, ErrorMessage = "Max participants must be at least 1")]
         public int MaxParticipants { get; set; }
+
+        // unique for each event ;>
+        [FirestoreProperty("qrCode")]
+        public string QrCode { get; set; }
     }
 }

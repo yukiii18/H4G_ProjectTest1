@@ -22,6 +22,11 @@
                             <strong>Max Participants:</strong> @ev.MaxParticipants<br />
                             <strong>Registration Due:</strong> @ev.RegistrationDueDate.ToDateTime().ToString("yyyy-MM-dd")
                         </p>
+                        <a class="btn btn-sm btn-secondary"
+                                   href="@Url.Action("DownloadEventQRCode", "Staff", new { eventId = ev.Id })"
+                                   target="_blank">
+                                    Download Attendance QR
+                        </a>
                     </div>
                 </div>
             </div>

@@ -83,5 +83,9 @@ namespace H4G_Project.Models
         public string WaitlistStatus { get; set; }
 
 
+
+        [FirestoreProperty("attendance")]
+        public bool Attendance { get; set; } = false;
+
     }
 }
