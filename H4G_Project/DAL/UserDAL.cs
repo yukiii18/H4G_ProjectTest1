@@ -94,5 +94,30 @@ namespace H4G_Project.DAL
 
             return userList;
         }
+
+        // Delete user by email
+        public async Task<bool> DeleteUser(string email)
+        {
+            try
+            {
+                CollectionReference usersRef = db.Collection("users");
+                Query query = usersRef.WhereEqualTo("Email", email);
+                QuerySnapshot snapshot = await query.GetSnapshotAsync();
+
+                if (snapshot.Documents.Count > 0)
+                {
+                    DocumentSnapshot doc = snapshot.Documents[0];
+                    await doc.Reference.DeleteAsync();
+                    return true;
+                }
+
+                return false; // User not found
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting user: {ex.Message}");
+                return false;
+            }
+        }
     }
 }
