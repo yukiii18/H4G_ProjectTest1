@@ -27,6 +27,8 @@
     </div>
 }
 
+<link rel="stylesheet" href="./css/applicationmodal.css">
+
 <div class="mt-3">
     <label for="disabilityFilter">Filter by Disability Type:</label>
     <select id="disabilityFilter" onchange="filterTable()" class="form-control w-25 d-inline-block">
@@ -35,6 +37,16 @@
         <option value="physical">Physical Disability</option>
         <option value="developmental">Developmental Disability</option>
         <option value="others">Others</option>
+    </select>
+</div>
+
+<div class="mt-3">
+    <label for="statusFilter">Filter by Status:</label>
+    <select id="statusFilter" onchange="filterTable()" class="form-control w-25 d-inline-block">
+        <option value="">-- All --</option>
+        <option value="approved">Approved</option>
+        <option value="declined">Declined</option>
+        <option value="pending">Pending</option>
     </select>
 </div>
 
@@ -72,7 +84,7 @@
                     <td>
                         <!-- Hyperlink that triggers modal -->
                         <a href="javascript:void(0);" class="text-primary"
-                            onclick="showDetails('@r.Id', '@r.FamilyMemberName', '@r.DisabilityType', '@r.CaregiverName', '@r.Notes', '@r.Email', '@r.ContactNumber', '@r.Occupation', '@(r.Status ?? "Pending")')">
+                            onclick="showDetails('@r.Id', '@r.FamilyMemberName', '@r.DisabilityType', '@r.CaregiverName', '@r.Notes', '@r.Email', '@r.ContactNumber', '@r.Occupation', '@(r.Status ?? "Pending")', '@r.MedicalReportUrl')">
                             View Details
                         </a>
                     </td>
@@ -119,8 +131,10 @@
 
             <div class="modal-footer" id="modalFooter">
                 <!-- Buttons will be dynamically updated based on status -->
-                <button type="button" class="btn btn-success" id="approveBtn" onclick="approveApplication()" style="display:none;">Approve</button>
-                <button type="button" class="btn btn-danger" id="rejectBtn" onclick="rejectApplication()" style="display:none;">Decline</button>
+                <button type="button" class="btn btn-success" id="approveBtn" onclick="approveApplication()"
+                    style="display:none;">Approve</button>
+                <button type="button" class="btn btn-danger" id="rejectBtn" onclick="rejectApplication()"
+                    style="display:none;">Decline</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
 
@@ -149,13 +163,14 @@
             document.getElementById("detailContact").innerText = contact;
             document.getElementById("detailOccupation").innerText = occupation;
 
-            // Hardcode at the moment, will need to change
-            document.getElementById("detailMedicalReport").src = "/file/report123.pdf";
-            //document.getElementById("detailMedicalReport").src = medicalReportUrl;
+            document.getElementById("detailMedicalReport").src = medicalReportUrl;
 
             // Show/hide buttons based on status
             const approveBtn = document.getElementById("approveBtn");
             const rejectBtn = document.getElementById("rejectBtn");
+
+            approveBtn.style.display = "inline-block";
+            rejectBtn.style.display = "inline-block";
 
             if (status === "Pending") {
                 approveBtn.style.display = "inline-block";
@@ -168,6 +183,52 @@
             $('#detailsModal').modal('show');
         }
 
+        function filterTable() {
+            const filterValue = document.getElementById("disabilityFilter").value.toLowerCase();
+            const table = document.getElementById("firebaseTable");
+            const rows = table.getElementsByTagName("tr");
+
+            // Loop through table rows (skip header row)
+            for (let i = 1; i < rows.length; i++) {
+                const disabilityCell = rows[i].getElementsByTagName("td")[1]; // 2nd column = Disability Type
+                if (disabilityCell) {
+                    const textValue = disabilityCell.textContent || disabilityCell.innerText;
+                    if (filterValue === "" || textValue.toLowerCase().includes(filterValue)) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        function filterTable() {
+            const disabilityValue = document.getElementById("disabilityFilter").value.toLowerCase();
+            const statusValue = document.getElementById("statusFilter").value.toLowerCase();
+            const table = document.getElementById("firebaseTable");
+            const rows = table.getElementsByTagName("tr");
+
+            // Loop through table rows (skip header row)
+            for (let i = 1; i < rows.length; i++) {
+                const disabilityCell = rows[i].getElementsByTagName("td")[1]; // Disability Type column
+                const statusCell = rows[i].getElementsByTagName("td")[3];     // Status column
+
+                if (disabilityCell && statusCell) {
+                    const disabilityText = disabilityCell.textContent.toLowerCase();
+                    const statusText = statusCell.textContent.toLowerCase();
+
+                    const disabilityMatch = (disabilityValue === "" || disabilityText.includes(disabilityValue));
+                    const statusMatch = (statusValue === "" || statusText.includes(statusValue));
+
+                    if (disabilityMatch && statusMatch) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
         function approveApplication() {
             if (!currentApplicationId) {
                 alert("Error: Application ID not found");
@@ -176,12 +237,12 @@
 
             // Close the modal first
             $('#detailsModal').modal('hide');
-            
+
             // Create a form and submit it to the ApproveApplication action
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '/Application/ApproveApplication';
-            
+
             // Add CSRF token
             const token = document.querySelector('input[name="__RequestVerificationToken"]');
             if (token) {
@@ -191,26 +252,26 @@
                 tokenInput.value = token.value;
                 form.appendChild(tokenInput);
             }
-            
+
             // Add application data
             const idInput = document.createElement('input');
             idInput.type = 'hidden';
             idInput.name = 'applicationId';
             idInput.value = currentApplicationId;
             form.appendChild(idInput);
-            
+
             const nameInput = document.createElement('input');
             nameInput.type = 'hidden';
             nameInput.name = 'applicantName';
             nameInput.value = currentApplicantName;
             form.appendChild(nameInput);
-            
+
             const emailInput = document.createElement('input');
             emailInput.type = 'hidden';
             emailInput.name = 'applicantEmail';
             emailInput.value = currentApplicantEmail;
             form.appendChild(emailInput);
-            
+
             document.body.appendChild(form);
             form.submit();
         }
@@ -226,7 +287,7 @@
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '/Application/RejectApplication';
-                
+
                 // Add CSRF token
                 const token = document.querySelector('input[name="__RequestVerificationToken"]');
                 if (token) {
@@ -236,24 +297,24 @@
                     tokenInput.value = token.value;
                     form.appendChild(tokenInput);
                 }
-                
+
                 // Add application data
                 const idInput = document.createElement('input');
                 idInput.type = 'hidden';
                 idInput.name = 'applicationId';
                 idInput.value = currentApplicationId;
                 form.appendChild(idInput);
-                
+
                 const nameInput = document.createElement('input');
                 nameInput.type = 'hidden';
                 nameInput.name = 'applicantName';
                 nameInput.value = currentApplicantName;
                 form.appendChild(nameInput);
-                
+
                 document.body.appendChild(form);
                 form.submit();
             }
-            
+
             $('#detailsModal').modal('hide');
         }
     </script>
