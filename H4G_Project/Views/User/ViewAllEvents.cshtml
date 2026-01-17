@@ -1,56 +1,67 @@
 ﻿@model List<H4G_Project.Models.Event>
-
 @{
-    ViewData["Title"] = "All Events";
+    ViewData["Title"] = "My Events";
     Layout = "~/Views/Shared/_Member.cshtml";
 }
 
 <div class="container mt-4">
-    <h3 class="mb-4">All Events</h3>
-
     <div class="row">
-        @if (Model != null && Model.Count > 0)
+        @foreach (var ev in Model)
         {
-            foreach (var ev in Model)
-            {
-                <div class="col-md-4 mb-4">
-                    <div class="card shadow-sm h-100">
-                        @* Event photo if exists *@
-                        @if (!string.IsNullOrEmpty(ev.eventPhoto))
-                        {
-                            <img src="@ev.eventPhoto" class="card-img-top" alt="@ev.Name" style="height:200px; object-fit:cover;" />
-                        }
+            <div class="col-md-4 mb-4">
+                <div class="card shadow" data-toggle="modal" data-target="#eventModal-@ev.Id" style="cursor:pointer;">
+                    <div class="card-body">
+                        <h5 class="card-title">@ev.Name</h5>
+                        <p class="card-text">
+                            <strong>Start:</strong> @ev.Start.ToDateTime().ToString("yyyy-MM-dd HH:mm") <br />
+                            <strong>End:</strong> @(ev.End?.ToDateTime().ToString("yyyy-MM-dd HH:mm") ?? "-") <br />
+                            <strong>Max Participants:</strong> @ev.MaxParticipants <br />
+                            <strong>Registration Due:</strong> @ev.RegistrationDueDate.ToDateTime().ToString("yyyy-MM-dd")
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">@ev.Name</h5>
+            <!-- Modal -->
+            <div class="modal fade" id="eventModal-@ev.Id" tabindex="-1" aria-labelledby="eventModalLabel-@ev.Id" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="eventModalLabel-@ev.Id">@ev.Name</h5>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
 
-                            @if (!string.IsNullOrEmpty(ev.Details))
-                            {
-                                <p class="card-text">@ev.Details</p>
-                            }
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                <strong>Start:</strong> @ev.Start.ToDateTime().ToString("yyyy-MM-dd HH:mm") <br />
+                                <strong>End:</strong> @(ev.End?.ToDateTime().ToString("yyyy-MM-dd HH:mm") ?? "-") <br />
+                                <strong>Max Participants:</strong> @ev.MaxParticipants <br />
+                                <strong>Registration Due:</strong> @ev.RegistrationDueDate.ToDateTime().ToString("yyyy-MM-dd")
+                            </p>
 
-                            <ul class="list-unstyled">
-                                <li><strong>Start:</strong> @ev.Start.ToDateTime().ToString("dd MMM yyyy HH:mm")</li>
-                                @if (ev.End != null)
-                                {
-                                    <li><strong>End:</strong> @ev.End?.ToDateTime().ToString("dd MMM yyyy HH:mm")</li>
+                            <hr />
+                            <h6>Comments</h6>
+                            <div id="comments-@ev.Id" class="mb-3">
+                                @{
+                                    var comments = await new H4G_Project.DAL.EventsDAL().GetComments(ev.Id);
+                                    foreach (var c in comments)
+                                    {
+                                        <p><strong>@c.username [@c.role]:</strong> @c.comment</p>
+                                    }
                                 }
-                                @if (ev.RegistrationDueDate != null)
-                                {
-                                    <li><strong>Registration Due:</strong> @ev.RegistrationDueDate.ToDateTime().ToString("dd MMM yyyy")</li>
-                                }
-                                <li><strong>Max Participants:</strong> @ev.MaxParticipants</li>
-                            </ul>
+                            </div>
 
+
+                            <form asp-action="AddComment" method="post">
+                                <input type="hidden" name="eventId" value="@ev.Id" />
+                                <div class="input-group">
+                                    <input type="text" name="comment" class="form-control" placeholder="Add a comment..." required />
+                                    <button type="submit" class="btn btn-primary">Comment</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-            }
-        }
-        else
-        {
-            <div class="col-12">
-                <div class="alert alert-info">No events found.</div>
             </div>
         }
     </div>

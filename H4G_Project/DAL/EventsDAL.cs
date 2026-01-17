@@ -283,13 +283,14 @@ namespace H4G_Project.DAL
 
 
         // Add a comment to an event
-        public async Task<bool> AddComment(string eventId, string username, string comment)
+        public async Task<bool> AddComment(string eventId, string username, string email, string comment)
         {
             try
             {
                 var commentData = new Dictionary<string, object>
         {
             { "username", username },
+            { "email", email }, // store email too
             { "comment", comment },
             { "timestamp", Timestamp.FromDateTime(DateTime.UtcNow) }
         };
@@ -308,7 +309,63 @@ namespace H4G_Project.DAL
             }
         }
 
-        
+
+        // Get comments for an event, including role from eventRegistrations
+        public async Task<List<(string username, string role, string comment)>> GetComments(string eventId)
+        {
+            var comments = new List<(string username, string role, string comment)>();
+
+            try
+            {
+                var snapshot = await db.Collection("events")
+                                       .Document(eventId)
+                                       .Collection("comments")
+                                       .OrderBy("timestamp")
+                                       .GetSnapshotAsync();
+
+                foreach (var doc in snapshot.Documents)
+                {
+                    if (doc.Exists)
+                    {
+                        var data = doc.ToDictionary();
+                        string username = data.ContainsKey("username") ? data["username"].ToString() : "Anonymous";
+                        string email = data.ContainsKey("email") ? data["email"].ToString() : "";
+                        string comment = data.ContainsKey("comment") ? data["comment"].ToString() : "";
+
+                        // Now query eventRegistrations using email
+                        string role = ""; // default
+                        if (!string.IsNullOrEmpty(email))
+                        {
+                            var regSnapshot = await db.Collection("eventRegistrations")
+                                                      .WhereEqualTo("eventID", eventId)
+                                                      .WhereEqualTo("email", email)
+                                                      .GetSnapshotAsync();
+
+                            foreach (var regDoc in regSnapshot.Documents)
+                            {
+                                if (regDoc.Exists && regDoc.TryGetValue("role", out object r))
+                                {
+                                    role = r.ToString();
+                                    break;
+                                }
+                            }
+                        }
+
+                        comments.Add((username, role, comment));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting comments: {ex.Message}");
+            }
+
+            return comments;
+        }
+
+
+
+
 
     }
 }

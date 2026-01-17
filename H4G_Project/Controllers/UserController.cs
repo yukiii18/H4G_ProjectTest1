@@ -122,6 +122,26 @@ namespace H4G_Project.Controllers
             return View(events);
         }
 
+        // Comments Section
+
+        [HttpPost]
+        public async Task<IActionResult> AddComment(string eventId, string comment)
+        {
+            string username = HttpContext.Session.GetString("Username") ?? "Anonymous";
+            string email = HttpContext.Session.GetString("UserEmail") ?? "";
+
+            if (string.IsNullOrEmpty(comment))
+                return BadRequest("Comment cannot be empty");
+
+            bool success = await _eventsDAL.AddComment(eventId, username, email, comment);
+
+            if (success)
+                return RedirectToAction("ViewAllEvents");
+
+            return BadRequest("Failed to add comment");
+        }
+
+
 
 
     }
