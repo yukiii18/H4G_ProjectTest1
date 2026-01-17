@@ -13,6 +13,7 @@ namespace H4G_Project.Controllers
         private readonly StaffDAL _staffContext = new StaffDAL();
         private readonly EventsDAL _eventsDAL = new EventsDAL();
         private readonly UserDAL _userContext = new UserDAL();
+        private readonly ApplicationDAL _applicationContext = new ApplicationDAL();
 
 
         // ===============================
@@ -158,11 +159,12 @@ namespace H4G_Project.Controllers
         // ADD USER
         // ===============================
         [HttpGet]
-        public IActionResult AddUser(string applicantName = "", string applicantEmail = "")
+        public IActionResult AddUser(string applicantName = "", string applicantEmail = "", string applicationId = "")
         {
             // Pass application data to view for pre-population
             ViewBag.ApplicantName = applicantName;
             ViewBag.ApplicantEmail = applicantEmail;
+            ViewBag.ApplicationId = applicationId;
             return View();
         }
 
@@ -172,6 +174,7 @@ namespace H4G_Project.Controllers
             string username = form["Username"];
             string email = form["Email"];
             string role = form["Role"];
+            string applicationId = form["ApplicationId"]; // Hidden field from the form
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(role))
             {
@@ -197,6 +200,12 @@ namespace H4G_Project.Controllers
                     Email = email,
                     Role = role
                 });
+
+                // Update application status to "Approved" if applicationId is provided (only after successful user creation)
+                if (!string.IsNullOrEmpty(applicationId))
+                {
+                    await _applicationContext.UpdateApplicationStatus(applicationId, "Approved");
+                }
 
                 // Pass the generated password to the view for display
                 TempData["SuccessMessage"] = $"User account created successfully for {username}.";

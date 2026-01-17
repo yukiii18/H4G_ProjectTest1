@@ -58,7 +58,8 @@ namespace H4G_Project.DAL
                     {"FamilyMemberName", application.FamilyMemberName},
                     {"Notes", application.Notes},
                     {"Occupation", application.Occupation},
-                    {"MedicalReportUrl", medicalReportUrl} // store local URL in Firestore
+                    {"MedicalReportUrl", medicalReportUrl}, // store local URL in Firestore
+                    {"Status", "Pending"} // Default status
                 };
 
                 await docRef.SetAsync(NewApplication);
@@ -82,11 +83,59 @@ namespace H4G_Project.DAL
                 if (document.Exists)
                 {
                     Application data = document.ConvertTo<Application>();
+                    // Set document ID for later updates
+                    data.Id = document.Id;
                     applicationList.Add(data);
                 }
             }
 
             return applicationList;
+        }
+
+        public async Task<bool> UpdateApplicationStatus(string applicationId, string status)
+        {
+            try
+            {
+                DocumentReference docRef = db.Collection("applicationForms").Document(applicationId);
+                Dictionary<string, object> updates = new Dictionary<string, object>
+                {
+                    {"Status", status}
+                };
+
+                await docRef.UpdateAsync(updates);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating application status: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<Application> GetApplicationByEmail(string email)
+        {
+            try
+            {
+                Query query = db.Collection("applicationForms").WhereEqualTo("Email", email);
+                QuerySnapshot snapshot = await query.GetSnapshotAsync();
+
+                foreach (DocumentSnapshot document in snapshot.Documents)
+                {
+                    if (document.Exists)
+                    {
+                        Application data = document.ConvertTo<Application>();
+                        data.Id = document.Id;
+                        return data;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting application by email: {ex.Message}");
+                return null;
+            }
         }
 
     }

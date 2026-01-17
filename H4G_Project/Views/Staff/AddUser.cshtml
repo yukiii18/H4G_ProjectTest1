@@ -325,6 +325,7 @@
 
         @using (Html.BeginForm("AddUser", "Staff", FormMethod.Post))
         {
+            <input type="hidden" name="ApplicationId" value="@ViewBag.ApplicationId" />
             <p>Username : <input type="text" name="Username" placeholder="Username" value="@ViewBag.ApplicantName" required /></p>
             <p>Email : <input type="email" name="Email" placeholder="Email" value="@ViewBag.ApplicantEmail" required /></p>
             <p><small class="text-muted">A temporary password will be generated automatically. The user can reset it after first login.</small></p>
