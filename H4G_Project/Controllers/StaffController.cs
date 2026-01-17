@@ -2,6 +2,7 @@
 using H4G_Project.DAL;
 using H4G_Project.Models;
 using FirebaseAdmin.Auth;
+using Google.Cloud.Firestore;
 using System.Threading.Tasks;
 using System.Linq;
 
@@ -201,6 +202,54 @@ namespace H4G_Project.Controllers
                 ModelState.AddModelError("", ex.Message);
                 return View();
             }
+        }
+
+        // Show create event page
+        [HttpGet]
+        public IActionResult CreateEvent()
+        {
+            return View(new Event());
+        }
+
+        // Handle create event
+        [HttpPost]
+        public async Task<IActionResult> CreateEvent(
+            string Name,
+            DateTime Start,
+            DateTime? End,
+            string Details,
+            DateTime RegistrationDueDate,
+            int MaxParticipants)
+        {
+            if (string.IsNullOrEmpty(Name))
+            {
+                ModelState.AddModelError("Name", "Event name is required");
+                return View();
+            }
+
+            // Create Event object
+            Event ev = new Event
+            {
+                Name = Name,
+                Start = Timestamp.FromDateTime(Start.ToUniversalTime()),
+                End = End.HasValue
+                    ? Timestamp.FromDateTime(End.Value.ToUniversalTime())
+                    : null,
+                RegistrationDueDate = Timestamp.FromDateTime(RegistrationDueDate.ToUniversalTime()),
+                MaxParticipants = MaxParticipants,
+                Details = Details
+            };
+
+            bool success = await _eventsDAL.AddEvent(ev);
+
+            if (success)
+            {
+                TempData["SuccessMessage"] = "Event created successfully!";
+                return RedirectToAction(nameof(CreateEvent));
+            }
+
+            ModelState.AddModelError("", "Failed to create event.");
+            return View();
         }
 
 
