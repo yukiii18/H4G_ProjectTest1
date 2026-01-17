@@ -327,7 +327,7 @@
         {
             <p>Username : <input type="text" name="Username" placeholder="Username" required /></p>
             <p>Email : <input type="email" name="Email" placeholder="Email" required /></p>
-            <p>Password : <input type="password" name="Password" placeholder="Min:8 Chars" required /></p>
+            <p>Password : <input type="password" name="Password" placeholder="Password (min 6 characters)" required /></p>
             <p>Role:
                 <label><input type="radio" name="Role" value="participant" required> Participant</label>
                 <label><input type="radio" name="Role" value="volunteer"> Volunteer</label>
@@ -386,3 +386,10 @@
     }); ``
 
 </script>
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        alert("@TempData["SuccessMessage"]");
+    </script>
+}
+
