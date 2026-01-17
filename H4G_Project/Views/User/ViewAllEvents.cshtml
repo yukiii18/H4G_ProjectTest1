@@ -44,10 +44,11 @@
                             <div id="comments-@ev.Id" class="mb-3">
                                 @{
                                     var comments = await new H4G_Project.DAL.EventsDAL().GetComments(ev.Id);
-                                    foreach (var c in comments)
+                                    @foreach (var c in comments)
                                     {
                                         <p><strong>@c.username [@c.role]:</strong> @c.comment</p>
                                     }
+
                                 }
                             </div>
 

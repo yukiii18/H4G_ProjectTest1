@@ -228,11 +228,12 @@ namespace H4G_Project.Controllers
         {
             string username = HttpContext.Session.GetString("Username") ?? "Anonymous";
             string email = HttpContext.Session.GetString("UserEmail") ?? "";
+            string role = HttpContext.Session.GetString("UserRole") ?? "";
 
             if (string.IsNullOrEmpty(comment))
                 return BadRequest("Comment cannot be empty");
 
-            bool success = await _eventsDAL.AddComment(eventId, username, email, comment);
+            bool success = await _eventsDAL.AddComment(eventId, username, email, comment, role);
 
             if (success)
                 return RedirectToAction("ViewAllEvents");

@@ -283,7 +283,7 @@ namespace H4G_Project.DAL
 
 
         // Add a comment to an event
-        public async Task<bool> AddComment(string eventId, string username, string email, string comment)
+        public async Task<bool> AddComment(string eventId, string username, string email, string comment, string role)
         {
             try
             {
@@ -292,6 +292,7 @@ namespace H4G_Project.DAL
             { "username", username },
             { "email", email }, // store email too
             { "comment", comment },
+            { "role", role },
             { "timestamp", Timestamp.FromDateTime(DateTime.UtcNow) }
         };
 
@@ -310,7 +311,7 @@ namespace H4G_Project.DAL
         }
 
 
-        // Get comments for an event, including role from eventRegistrations
+        // Get comments for an event (role is stored in the comment document)
         public async Task<List<(string username, string role, string comment)>> GetComments(string eventId)
         {
             var comments = new List<(string username, string role, string comment)>();
@@ -329,27 +330,8 @@ namespace H4G_Project.DAL
                     {
                         var data = doc.ToDictionary();
                         string username = data.ContainsKey("username") ? data["username"].ToString() : "Anonymous";
-                        string email = data.ContainsKey("email") ? data["email"].ToString() : "";
                         string comment = data.ContainsKey("comment") ? data["comment"].ToString() : "";
-
-                        // Now query eventRegistrations using email
-                        string role = ""; // default
-                        if (!string.IsNullOrEmpty(email))
-                        {
-                            var regSnapshot = await db.Collection("eventRegistrations")
-                                                      .WhereEqualTo("eventID", eventId)
-                                                      .WhereEqualTo("email", email)
-                                                      .GetSnapshotAsync();
-
-                            foreach (var regDoc in regSnapshot.Documents)
-                            {
-                                if (regDoc.Exists && regDoc.TryGetValue("role", out object r))
-                                {
-                                    role = r.ToString();
-                                    break;
-                                }
-                            }
-                        }
+                        string role = data.ContainsKey("role") ? data["role"].ToString() : "";
 
                         comments.Add((username, role, comment));
                     }
@@ -362,6 +344,7 @@ namespace H4G_Project.DAL
 
             return comments;
         }
+
 
 
 
