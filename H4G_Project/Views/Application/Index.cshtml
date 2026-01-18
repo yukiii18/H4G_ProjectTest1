@@ -311,6 +311,12 @@
                 nameInput.value = currentApplicantName;
                 form.appendChild(nameInput);
 
+                const emailInput = document.createElement('input');
+                emailInput.type = 'hidden';
+                emailInput.name = 'applicantEmail';
+                emailInput.value = currentApplicantEmail;
+                form.appendChild(emailInput);
+
                 document.body.appendChild(form);
                 form.submit();
             }
