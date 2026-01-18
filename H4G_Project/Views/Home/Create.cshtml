@@ -107,6 +107,13 @@ p { text-align: left; margin: 0 0 10px 0; }
     <div id="formContent">
         <h1 class="User active underlineHover">BE A PART OF MINDS</h1>
 
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div style="color: red; margin: 10px 0; padding: 10px; background-color: #ffe6e6; border: 1px solid #ff0000; border-radius: 5px;">
+                @ViewBag.ErrorMessage
+            </div>
+        }
+
         @using (Html.BeginForm("NewApplication", "Application", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             <h2 class="mt-4">Caregiver Information</h2>

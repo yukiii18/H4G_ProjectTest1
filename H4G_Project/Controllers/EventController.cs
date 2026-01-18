@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
-using Firebase.Storage;
 using Google.Cloud.Firestore.V1;
 using System.Dynamic;
 

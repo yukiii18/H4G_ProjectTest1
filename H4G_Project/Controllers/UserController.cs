@@ -12,6 +12,8 @@ namespace H4G_Project.Controllers
         private readonly UserDAL _userContext = new UserDAL();
         private readonly EventsDAL _eventsDAL = new EventsDAL();
 
+        private readonly NotificationDAL _notificationDAL = new NotificationDAL();
+
 
         // Attendance system
         public IActionResult ScanQR()
@@ -161,7 +163,7 @@ namespace H4G_Project.Controllers
             string confirmPassword = form["ConfirmPassword"];
 
             // Validate inputs
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(currentPassword) || 
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(currentPassword) ||
                 string.IsNullOrEmpty(newPassword) || string.IsNullOrEmpty(confirmPassword))
             {
                 TempData["ErrorMessage"] = "Please fill in all fields.";
@@ -184,21 +186,21 @@ namespace H4G_Project.Controllers
             {
                 // 1. Verify current password by trying to sign in
                 var auth = FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance;
-                
+
                 // Get user by email
                 var userRecord = await auth.GetUserByEmailAsync(email);
-                
+
                 // Note: Firebase Admin SDK doesn't have a direct way to verify password
                 // In a real implementation, you might want to use Firebase Client SDK
                 // For now, we'll update the password directly
-                
+
                 // 2. Update password in Firebase
                 var updateRequest = new UserRecordArgs()
                 {
                     Uid = userRecord.Uid,
                     Password = newPassword
                 };
-                
+
                 await auth.UpdateUserAsync(updateRequest);
 
                 TempData["SuccessMessage"] = "Password reset successfully! You can now login with your new password.";
@@ -269,9 +271,147 @@ namespace H4G_Project.Controllers
             return RedirectToAction("ViewAllEvents");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetNotifications()
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("UserEmail");
+                Console.WriteLine($"GetNotifications called for email: {email}");
 
+                if (string.IsNullOrEmpty(email))
+                {
+                    Console.WriteLine("No email in session - user not logged in");
+                    return Unauthorized();
+                }
 
+                var notifications = await _notificationDAL.GetUserNotifications(email);
+                Console.WriteLine($"Found {notifications.Count} notifications for {email}");
 
+                // Convert to a format that JavaScript can handle properly
+                var notificationResponse = notifications.Select(n => new
+                {
+                    id = n.Id,
+                    userId = n.UserId,
+                    title = n.Title,
+                    message = n.Message,
+                    eventId = n.EventId,
+                    eventName = n.EventName,
+                    type = n.Type,
+                    isRead = n.IsRead,
+                    createdBy = n.CreatedBy,
+                    createdAt = n.CreatedAt.ToDateTime().ToString("o"), // ISO 8601 format
+                    createdAtMs = n.CreatedAt.ToDateTime().Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds
+                }).ToList();
+
+                return Json(notificationResponse);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting notifications: {ex.Message}");
+                return StatusCode(500, "Error getting notifications");
+            }
+        }
+
+        // Get unread notification count
+        [HttpGet]
+        public async Task<IActionResult> GetUnreadCount()
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("UserEmail");
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Json(0);
+                }
+
+                var count = await _notificationDAL.GetUnreadCount(email);
+                return Json(count);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting unread count: {ex.Message}");
+                return Json(0);
+            }
+        }
+
+        // Mark notification as read
+        [HttpPost]
+        public async Task<IActionResult> MarkNotificationRead(string notificationId)
+        {
+            try
+            {
+                bool success = await _notificationDAL.MarkAsRead(notificationId);
+                return Json(new { success = success });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error marking notification as read: {ex.Message}");
+                return Json(new { success = false });
+            }
+        }
+
+        // Mark all notifications as read
+        [HttpPost]
+        public async Task<IActionResult> MarkAllNotificationsRead()
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("UserEmail");
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized();
+                }
+
+                bool success = await _notificationDAL.MarkAllAsRead(email);
+                return Json(new { success = success });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error marking all notifications as read: {ex.Message}");
+                return Json(new { success = false });
+            }
+        }
+
+        // Show notifications page
+        public IActionResult Notifications()
+        {
+            return View();
+        }
+
+        // Test method to create a notification
+        [HttpPost]
+        public async Task<IActionResult> CreateTestNotification()
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("UserEmail");
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Json(new { success = false, message = "Not logged in" });
+                }
+
+                var notification = new Notification
+                {
+                    UserId = email,
+                    Title = "Test Notification",
+                    Message = "This is a test notification created manually",
+                    EventId = "test-event",
+                    EventName = "Test Event",
+                    Type = "test",
+                    CreatedBy = "System",
+                    IsRead = false
+                };
+
+                bool success = await _notificationDAL.AddNotification(notification);
+                return Json(new { success = success, message = success ? "Test notification created" : "Failed to create notification" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating test notification: {ex.Message}");
+                return Json(new { success = false, message = "Error creating notification" });
+            }
+        }
 
 
     }

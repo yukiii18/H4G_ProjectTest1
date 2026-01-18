@@ -1,6 +1,7 @@
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using H4G_Project.DAL;
+using H4G_Project.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,7 @@ if (FirebaseApp.DefaultInstance == null)
     });
 }
 
+builder.Services.AddScoped<NotificationService>();
 
 // Session
 builder.Services.AddDistributedMemoryCache();

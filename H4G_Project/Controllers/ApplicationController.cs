@@ -2,16 +2,17 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using H4G_Project.DAL;
 using H4G_Project.Models;
+using H4G_Project.Services;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
-using Firebase.Storage;
 using Google.Cloud.Firestore.V1;
 using System.Dynamic;
 using System.Net;
 using System.Net.Mail;
+using Google.Cloud.Storage.V1;
 
 namespace H4G_Project.Controllers
 {
@@ -19,11 +20,22 @@ namespace H4G_Project.Controllers
     {
         ApplicationDAL applicationContext = new ApplicationDAL();
         private readonly IConfiguration _config;
+        private readonly NotificationService _notificationService;
 
-        public ApplicationController(IConfiguration config)
+        // Combine both into one constructor
+        public ApplicationController(IConfiguration config, NotificationService notificationService)
         {
             _config = config;
+            _notificationService = notificationService;
         }
+
+        // Example usage
+        public async Task<IActionResult> NotifyUser(string token)
+        {
+            await _notificationService.SendNotificationAsync(token, "Update", "Your application status changed.");
+            return Ok("Notification sent");
+        }
+
 
         // Show list of applications
         public async Task<ActionResult> Index()
@@ -43,22 +55,40 @@ namespace H4G_Project.Controllers
         [HttpGet]
         public IActionResult NewApplication()
         {
-            return View();
+            return View("~/Views/Home/Create.cshtml");
         }
 
         // Handle form submission (POST)
         [HttpPost]
-        public async Task<IActionResult> NewApplication(Application application, IFormFile medicalReport)
+        public async Task<IActionResult> NewApplication(Application application, IFormFile medicalReport, IFormFile idDocument)
         {
-            bool success = await applicationContext.AddApplication(application, medicalReport);
+            try
+            {
+                // Add some debugging
+                Console.WriteLine($"Received application for: {application?.CaregiverName}");
+                Console.WriteLine($"Medical report file: {medicalReport?.FileName} ({medicalReport?.Length} bytes)");
+                Console.WriteLine($"ID document file: {idDocument?.FileName} ({idDocument?.Length} bytes)");
 
-            if (success)
-            {
-                return RedirectToAction("Index", "Home");
+                bool success = await applicationContext.AddApplication(application, medicalReport, idDocument);
+
+                if (success)
+                {
+                    Console.WriteLine("Application saved successfully");
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    Console.WriteLine("Failed to save application");
+                    ViewBag.ErrorMessage = "Failed to save application. Please try again.";
+                    return View("~/Views/Home/Create.cshtml", application);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return View("Error");
+                Console.WriteLine($"Error in NewApplication: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                ViewBag.ErrorMessage = $"An error occurred: {ex.Message}";
+                return View("~/Views/Home/Create.cshtml", application);
             }
         }
 

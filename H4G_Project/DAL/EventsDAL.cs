@@ -240,6 +240,12 @@ namespace H4G_Project.DAL
             return snapshot.Documents.Select(d => d.ConvertTo<EventRegistration>()).ToList();
         }
 
+        // Get registered users for notifications
+        public async Task<List<EventRegistration>> GetRegisteredUsers(string eventId)
+        {
+            return await GetRegistrationsByEventId(eventId);
+        }
+
         public async Task<Event?> GetEventById(string id)
         {
             var doc = await db.Collection("events").Document(id).GetSnapshotAsync();
@@ -261,6 +267,26 @@ namespace H4G_Project.DAL
             catch (Exception ex)
             {
                 Console.WriteLine($"Error updating registration: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Update attendance for a specific registration
+        public async Task<bool> UpdateAttendance(string registrationId, bool attendance)
+        {
+            try
+            {
+                var docRef = db.Collection("eventRegistrations").Document(registrationId);
+                var updates = new Dictionary<string, object>
+                {
+                    { "attendance", attendance }
+                };
+                await docRef.UpdateAsync(updates);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating attendance: {ex.Message}");
                 return false;
             }
         }

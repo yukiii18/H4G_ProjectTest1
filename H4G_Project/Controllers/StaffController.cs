@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using H4G_Project.DAL;
 using H4G_Project.Models;
+using H4G_Project.Services;
 using FirebaseAdmin.Auth;
 using Google.Cloud.Firestore;
 using System.Threading.Tasks;
@@ -18,6 +19,13 @@ namespace H4G_Project.Controllers
         private readonly EventsDAL _eventsDAL = new EventsDAL();
         private readonly UserDAL _userContext = new UserDAL();
         private readonly ApplicationDAL _applicationContext = new ApplicationDAL();
+        private readonly NotificationService _notificationService;
+        private readonly NotificationDAL _notificationDAL = new NotificationDAL();
+
+        public StaffController(NotificationService notificationService)
+        {
+            _notificationService = notificationService;
+        }
 
 
         // ===============================
@@ -356,9 +364,48 @@ namespace H4G_Project.Controllers
             string role = HttpContext.Session.GetString("UserRole") ?? "staff";
             string email = HttpContext.Session.GetString("StaffEmail") ?? "";
 
-            await _eventsDAL.AddComment(eventId, username, email, comment, role, parentCommentId);
+            // Add the comment to the database
+            bool commentAdded = await _eventsDAL.AddComment(eventId, username, email, comment, role, parentCommentId);
+
+            if (commentAdded)
+            {
+                // Create notifications for users registered for this event
+                await CreateCommentNotifications(eventId, username, comment);
+            }
 
             return RedirectToAction("ViewAllEvents");
+        }
+
+        private async Task CreateCommentNotifications(string eventId, string staffUsername, string comment)
+        {
+            try
+            {
+                // Get event details for notification
+                var eventDetails = await _eventsDAL.GetEventById(eventId);
+                if (eventDetails == null) return;
+
+                // Create notifications using NotificationDAL
+                bool success = await _notificationDAL.CreateCommentNotifications(
+                    eventId,
+                    eventDetails.Name,
+                    staffUsername,
+                    comment
+                );
+
+                if (success)
+                {
+                    Console.WriteLine($"Successfully created notifications for comment on event {eventDetails.Name}");
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to create notifications for event {eventId}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating comment notifications: {ex.Message}");
+                // Don't throw - notification failure shouldn't break comment posting
+            }
         }
 
         private string GenerateRandomPassword()
