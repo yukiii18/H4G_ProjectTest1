@@ -78,5 +78,37 @@ namespace H4G_Project.DAL
 
             return staffList;
         }
+
+        // Update staff LastDayOfService
+        public async Task<bool> UpdateStaffLastDayOfService(string email, string lastDayOfService)
+        {
+            try
+            {
+                CollectionReference staffRef = db.Collection("staff");
+                Query query = staffRef.WhereEqualTo("Email", email);
+                QuerySnapshot querySnapshot = await query.GetSnapshotAsync();
+
+                if (querySnapshot.Documents.Count == 0)
+                {
+                    return false; // Staff not found
+                }
+
+                DocumentSnapshot staffDoc = querySnapshot.Documents[0];
+                DocumentReference staffDocRef = staffDoc.Reference;
+
+                var updates = new Dictionary<string, object>
+                {
+                    { "LastDayOfService", lastDayOfService ?? "" }
+                };
+
+                await staffDocRef.UpdateAsync(updates);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating staff LastDayOfService: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

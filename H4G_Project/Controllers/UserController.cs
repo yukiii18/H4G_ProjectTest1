@@ -13,7 +13,18 @@ namespace H4G_Project.Controllers
         private readonly EventsDAL _eventsDAL = new EventsDAL();
 
         private readonly NotificationDAL _notificationDAL = new NotificationDAL();
+        private readonly StaffDAL _staffContext = new StaffDAL();
 
+        public async Task<ActionResult> ViewUsers()
+        {
+            var users = await _userContext.GetAllUsers();
+            var staff = await _staffContext.GetAllStaff();
+
+            ViewBag.Users = users;
+            ViewBag.Staff = staff;
+
+            return View();
+        }
 
         // Attendance system
         public IActionResult ScanQR()
@@ -441,6 +452,100 @@ namespace H4G_Project.Controllers
             }
         }
 
+        // Deactivate user
+        [HttpPost]
+        public async Task<IActionResult> DeactivateUser(string email)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Json(new { success = false, message = "Email is required" });
+                }
+
+                // Set LastDayOfService to today's date to deactivate the user
+                string today = DateTime.Today.ToString("yyyy-MM-dd");
+                bool success = await _userContext.UpdateUserLastDayOfService(email, today);
+
+                return Json(new
+                {
+                    success = success,
+                    message = success ? "User deactivated successfully" : "Failed to deactivate user"
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deactivating user: {ex.Message}");
+                return Json(new { success = false, message = "Error deactivating user" });
+            }
+        }
+
+        // Reactivate user
+        [HttpPost]
+        public async Task<IActionResult> ReactivateUser(string email)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Json(new { success = false, message = "Email is required" });
+                }
+
+                // Clear LastDayOfService to reactivate the user
+                bool success = await _userContext.UpdateUserLastDayOfService(email, null);
+
+                return Json(new
+                {
+                    success = success,
+                    message = success ? "User reactivated successfully" : "Failed to reactivate user"
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error reactivating user: {ex.Message}");
+                return Json(new { success = false, message = "Error reactivating user" });
+            }
+        }
+
+        // Update staff LastDayOfService
+        [HttpPost]
+        public async Task<IActionResult> UpdateStaffLastDayOfService(string email, string lastDayOfService)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Json(new { success = false, message = "Email is required" });
+                }
+
+                // Validate date if provided
+                if (!string.IsNullOrEmpty(lastDayOfService))
+                {
+                    if (!DateTime.TryParse(lastDayOfService, out DateTime parsedDate))
+                    {
+                        return Json(new { success = false, message = "Invalid date format" });
+                    }
+
+                    if (parsedDate.Date < DateTime.Today)
+                    {
+                        return Json(new { success = false, message = "Last day of service must be today or a future date" });
+                    }
+                }
+
+                bool success = await _staffContext.UpdateStaffLastDayOfService(email, lastDayOfService);
+
+                return Json(new
+                {
+                    success = success,
+                    message = success ? "Staff last day of service updated successfully" : "Failed to update staff"
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating staff: {ex.Message}");
+                return Json(new { success = false, message = "Error updating staff" });
+            }
+        }
 
     }
 }

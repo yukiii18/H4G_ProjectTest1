@@ -26,5 +26,9 @@ namespace H4G_Project.Models
         [FirestoreProperty("EngagementType")]
         [Display(Name = "Engagement Type")]
         public string? EngagementType { get; set; } = "Ad hoc engagement"; // Default engagement type
+
+        [FirestoreProperty("LastDayOfService")]
+        [Display(Name = "Last Day of Service")]
+        public string? LastDayOfService { get; set; } = null;
     }
 }

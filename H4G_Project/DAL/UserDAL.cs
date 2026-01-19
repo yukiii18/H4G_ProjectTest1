@@ -67,7 +67,8 @@ namespace H4G_Project.DAL
                     { "Username", user.Username },
                     { "Email", user.Email },
                     { "Role", user.Role },
-                    { "EngagementType", user.EngagementType ?? "Ad hoc engagement" } // Default engagement type
+                    { "EngagementType", user.EngagementType ?? "Ad hoc engagement" }, // Default engagement type
+                    { "LastDayOfService", user.LastDayOfService ?? null } // Default to null
                 };
 
                 await db.Collection("users").AddAsync(userData);
@@ -117,6 +118,35 @@ namespace H4G_Project.DAL
             catch (Exception ex)
             {
                 Console.WriteLine($"Error deleting user: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Update user LastDayOfService (for deactivation)
+        public async Task<bool> UpdateUserLastDayOfService(string email, string lastDayOfService)
+        {
+            try
+            {
+                CollectionReference usersRef = db.Collection("users");
+                Query query = usersRef.WhereEqualTo("Email", email);
+                QuerySnapshot snapshot = await query.GetSnapshotAsync();
+
+                if (snapshot.Documents.Count > 0)
+                {
+                    DocumentSnapshot doc = snapshot.Documents[0];
+                    var updates = new Dictionary<string, object>
+                    {
+                        { "LastDayOfService", lastDayOfService ?? "" }
+                    };
+                    await doc.Reference.UpdateAsync(updates);
+                    return true;
+                }
+
+                return false; // User not found
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating user LastDayOfService: {ex.Message}");
                 return false;
             }
         }

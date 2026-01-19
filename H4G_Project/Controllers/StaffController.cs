@@ -303,7 +303,6 @@ namespace H4G_Project.Controllers
 
             try
             {
-                // 1️⃣ Create user in Firebase
                 var userRecord = await FirebaseAuth.DefaultInstance.CreateUserAsync(new UserRecordArgs
                 {
                     Email = email,
@@ -314,7 +313,8 @@ namespace H4G_Project.Controllers
                 {
                     Username = username,
                     Email = email,
-                    Role = role
+                    Role = role,
+                    LastDayOfService = null // Explicitly set to null for new users
                 });
 
                 // Update application status to "Approved" if applicationId is provided (only after successful user creation)
@@ -373,7 +373,6 @@ namespace H4G_Project.Controllers
                 return View();
             }
 
-            // 1️⃣ Create Event object WITHOUT photo first
             Event ev = new Event
             {
                 Name = Name,
