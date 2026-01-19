@@ -5,6 +5,8 @@
     Layout = "~/Views/Shared/_Staff.cshtml";
 }
 
+<link rel="stylesheet" href="~/css/applicationmodal.css" />
+
 @Html.AntiForgeryToken()
 
 @if (TempData["SuccessMessage"] != null)
@@ -30,18 +32,23 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="fas fa-hands-helping"></i> Volunteer Registrations</h2>
-        <a href="@Url.Action("Index", "Application")" class="btn btn-primary">
-            <i class="fas fa-user-plus"></i> View Client Applications
-        </a>
+        <div>
+            <a href="@Url.Action("Index", "Application")" class="btn btn-info mr-2">
+                <i class="fas fa-user-plus"></i> View Client Applications
+            </a>
+            <a href="@Url.Action("VolunteerApplications", "Application")" class="btn btn-success">
+                <i class="fas fa-user-check"></i> View Volunteer Applications
+            </a>
+        </div>
     </div>
 
     <div class="mt-3">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label for="searchInput">Search:</label>
                 <input type="text" id="searchInput" onkeyup="searchVolunteerTable()" class="form-control" placeholder="Search by name, email, or event...">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label for="eventFilter">Filter by Event:</label>
                 <select id="eventFilter" onchange="filterVolunteerTable()" class="form-control">
                     <option value="">-- All Events --</option>
@@ -54,7 +61,7 @@
                     }
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label for="volunteerStatusFilter">Filter by Status:</label>
                 <select id="volunteerStatusFilter" onchange="filterVolunteerTable()" class="form-control">
                     <option value="">-- All Statuses --</option>
@@ -62,6 +69,12 @@
                     <option value="approved">Approved</option>
                     <option value="declined">Declined</option>
                 </select>
+            </div>
+            <div class="col-md-3">
+                <label>&nbsp;</label> <!-- Empty label for alignment -->
+                <button type="button" class="btn btn-outline-secondary btn-block" onclick="clearAllVolunteerFilters()">
+                    <i class="fas fa-times-circle"></i> Clear Filters
+                </button>
             </div>
         </div>
     </div>
@@ -393,6 +406,20 @@
 
         function searchVolunteerTable() {
             filterVolunteerTable(); // Reuse the existing filter logic
+        }
+
+        function clearAllVolunteerFilters() {
+            // Clear search input
+            document.getElementById("searchInput").value = "";
+            
+            // Reset event filter
+            document.getElementById("eventFilter").selectedIndex = 0;
+            
+            // Reset status filter
+            document.getElementById("volunteerStatusFilter").selectedIndex = 0;
+            
+            // Reapply filters (which will show all rows since filters are cleared)
+            filterVolunteerTable();
         }
     </script>
 }

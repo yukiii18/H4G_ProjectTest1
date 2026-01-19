@@ -50,6 +50,18 @@ namespace H4G_Project.Controllers
             return View(sortedApplications);
         }
 
+        public async Task<ActionResult> VolunteerApplications()
+        {
+            var applications = await applicationContext.GetAllVolunteerApplications();
+
+            // Sort applications: Pending first, then Declined, then Approved at bottom
+            var sortedApplications = applications
+                .OrderBy(a => a.Status == "Pending" ? 0 : (a.Status == "Declined" ? 1 : 2))
+                .ToList();
+
+            return View(sortedApplications);
+        }
+
         // Show volunteer registrations page
         public async Task<ActionResult> VolunteerRegistrations()
         {
@@ -106,6 +118,67 @@ namespace H4G_Project.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult NewVolunteerApplication()
+        {
+            return View("~/Views/Home/CreateVolunteer.cshtml");
+        }
+
+        // Handle form submission from volunteer form (POST)
+        [HttpPost]
+        public async Task<IActionResult> NewVolunteerApplication(VolunteerApplication application, IFormFile resume)
+        {
+            try
+            {
+                // Validate DateOfBirth if provided
+                if (!string.IsNullOrEmpty(application.DateOfBirth))
+                {
+                    if (DateTime.TryParse(application.DateOfBirth, out DateTime parsedDate))
+                    {
+                        if (parsedDate.Date > DateTime.Today)
+                        {
+                            ViewBag.ErrorMessage = "Date of Birth cannot be in the future.";
+                            return View("~/Views/Home/CreateVolunteer.cshtml", application);
+                        }
+
+                        // Optional: Check for reasonable age limits (e.g., not older than 120 years)
+                        var minDate = DateTime.Today.AddYears(-120);
+                        if (parsedDate.Date < minDate)
+                        {
+                            ViewBag.ErrorMessage = "Please enter a valid date of birth.";
+                            return View("~/Views/Home/CreateVolunteer.cshtml", application);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.ErrorMessage = "Invalid date format for Date of Birth.";
+                        return View("~/Views/Home/CreateVolunteer.cshtml", application);
+                    }
+                }
+
+                bool success = await applicationContext.AddVolunteerApplication(application, resume);
+
+                if (success)
+                {
+                    Console.WriteLine("Application saved successfully");
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    Console.WriteLine("Failed to save application");
+                    ViewBag.ErrorMessage = "Failed to save application. Please try again.";
+                    return View("~/Views/Home/CreateVolunteer.cshtml", application);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in NewApplication: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                ViewBag.ErrorMessage = $"An error occurred: {ex.Message}";
+                return View("~/Views/Home/CreateVolunteer.cshtml", application);
+            }
+        }
+
         // Approve application
         [HttpPost]
         public async Task<IActionResult> ApproveApplication(string applicationId, string applicantName, string applicantEmail)
@@ -139,13 +212,13 @@ namespace H4G_Project.Controllers
 
                 if (success)
                 {
-                                        var smtpClient = new SmtpClient("smtp.gmail.com")
+                    var smtpClient = new SmtpClient("smtp.gmail.com")
                     {
                         Port = 587,
                         Credentials = new NetworkCredential(
-                            _config["EmailSettings:SenderEmail"],
-                            _config["EmailSettings:SenderPassword"]
-                        ),
+        _config["EmailSettings:SenderEmail"],
+        _config["EmailSettings:SenderPassword"]
+    ),
                         EnableSsl = true,
                     };
 

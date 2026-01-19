@@ -47,10 +47,6 @@ namespace H4G_Project.DAL
         {
             try
             {
-                Console.WriteLine("Starting AddApplication method");
-                Console.WriteLine($"Service account path: {serviceAccountPath}");
-                Console.WriteLine($"Bucket name: {bucketName}");
-
                 string medicalReportUrl = null;
                 string idDocumentUrl = null;
 
@@ -136,6 +132,68 @@ namespace H4G_Project.DAL
             }
         }
 
+        public async Task<bool> AddVolunteerApplication(VolunteerApplication application, IFormFile resume)
+        {
+            try
+            {
+                string resumeUrl = null;
+
+                // Use environment variable for credentials
+                var credential = GoogleCredential.FromFile(serviceAccountPath);
+                var storageClient = await StorageClient.CreateAsync(credential);
+                Console.WriteLine("Firebase Storage client created successfully");
+
+                // Upload medical report
+                if (resume != null && resume.Length > 0)
+                {
+                    var fileName = $"resumes/{Guid.NewGuid()}_{resume.FileName}";
+
+                    using var stream = resume.OpenReadStream();
+
+                    var obj = await storageClient.UploadObjectAsync(
+                        bucketName,
+                        fileName,
+                        resume.ContentType,
+                        stream
+                    );
+
+                    resumeUrl = $"https://storage.googleapis.com/{bucketName}/{fileName}";
+                    Console.WriteLine($"Resume uploaded successfully: {resumeUrl}");
+                }
+                else
+                {
+                    Console.WriteLine("No resume file provided");
+                }
+
+                // Save application data to Firestore
+                Console.WriteLine("Saving application data to Firestore");
+                DocumentReference docRef = db.Collection("volunteerApplicationForms").Document();
+                Dictionary<string, object> NewApplication = new Dictionary<string, object>
+                    {
+                        {"Name", application.Name ?? ""},
+                        {"ContactNumber", application.ContactNumber ?? ""},
+                        {"DateOfBirth", application.DateOfBirth ?? ""},
+                        {"Email", application.Email ?? ""},
+                        {"Notes", application.Notes ?? ""},
+                        {"Occupation", application.Occupation ?? ""},
+                        {"ResumeUrl", resumeUrl ?? ""}, // Firebase Storage URL
+                        {"Status", "Pending"} // Default status
+                    };
+
+                Console.WriteLine($"Document data prepared. Document ID: {docRef.Id}");
+                await docRef.SetAsync(NewApplication);
+                Console.WriteLine("Application saved to Firestore successfully");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding application: {ex.Message}");
+                Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return false;
+            }
+        }
+
         /// <summary>
         /// Get all applications from Firestore with signed URLs for file access
         /// </summary>
@@ -162,6 +220,33 @@ namespace H4G_Project.DAL
                     if (!string.IsNullOrEmpty(data.IdDocumentUrl))
                     {
                         data.IdDocumentUrl = await GenerateSignedUrl(data.IdDocumentUrl);
+                    }
+
+                    applicationList.Add(data);
+                }
+            }
+
+            return applicationList;
+        }
+
+        public async Task<List<VolunteerApplication>> GetAllVolunteerApplications()
+        {
+            List<VolunteerApplication> applicationList = new List<VolunteerApplication>();
+
+            Query allApplicationsQuery = db.Collection("volunteerApplicationForms");
+            QuerySnapshot snapshot = await allApplicationsQuery.GetSnapshotAsync();
+
+            foreach (DocumentSnapshot document in snapshot.Documents)
+            {
+                if (document.Exists)
+                {
+                    VolunteerApplication data = document.ConvertTo<VolunteerApplication>();
+                    data.Id = document.Id; // set Firestore document ID
+
+                    // Generate signed URLs for file access
+                    if (!string.IsNullOrEmpty(data.ResumeUrl))
+                    {
+                        data.ResumeUrl = await GenerateSignedUrl(data.ResumeUrl);
                     }
 
                     applicationList.Add(data);
@@ -206,9 +291,9 @@ namespace H4G_Project.DAL
             {
                 DocumentReference docRef = db.Collection("applicationForms").Document(applicationId);
                 Dictionary<string, object> updates = new Dictionary<string, object>
-                {
-                    {"Status", status}
-                };
+                        {
+                            {"Status", status}
+                        };
 
                 await docRef.UpdateAsync(updates);
                 return true;

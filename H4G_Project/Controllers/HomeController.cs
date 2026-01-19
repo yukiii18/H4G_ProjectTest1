@@ -24,6 +24,10 @@ namespace H4G_Project.Controllers
             return View();
         }
 
+        public ActionResult CreateVolunteer()
+        {
+            return View();
+        }
 
         // check two different forms to see if there are any values in the text field.
         // Run login function to check the db for confirmation on the user for the form with details
