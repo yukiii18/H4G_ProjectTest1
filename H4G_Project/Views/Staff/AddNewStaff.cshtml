@@ -11,6 +11,22 @@
                     <h4 class="mb-0">Add New Staff Member</h4>
                 </div>
                 <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @if (TempData["WarningMessage"] != null)
+                    {
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            @TempData["WarningMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
                     @if (ViewData.ModelState.Count > 0 && !ViewData.ModelState.IsValid)
                     {
                         <div class="alert alert-danger">
@@ -23,7 +39,7 @@
 
                     <form method="post" action="/Staff/NewStaff">
                         @Html.AntiForgeryToken()
-                        
+
                         <div class="mb-3">
                             <label for="Username" class="form-label">Username <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="Username" name="Username" required>
@@ -42,8 +58,10 @@
 
                         <div class="mb-3">
                             <label for="LastDayOfService" class="form-label">Last Day of Service</label>
-                            <input type="date" class="form-control" id="LastDayOfService" name="LastDayOfService" min="@DateTime.Today.ToString("yyyy-MM-dd")">
-                            <div class="form-text">Leave empty for no expiration date. Must be today or a future date.</div>
+                            <input type="date" class="form-control" id="LastDayOfService" name="LastDayOfService"
+                                min="@DateTime.Today.ToString("yyyy-MM-dd")">
+                            <div class="form-text">Leave empty for no expiration date. Must be today or a future date.
+                            </div>
                         </div>
 
                         <div class="d-grid gap-2">
@@ -60,11 +78,11 @@
 @section Scripts {
     <script>
         // Additional client-side validation for LastDayOfService
-        document.getElementById('LastDayOfService').addEventListener('change', function() {
+        document.getElementById('LastDayOfService').addEventListener('change', function () {
             const selectedDate = new Date(this.value);
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
-            
+
             if (selectedDate < today) {
                 alert('Last Day of Service must be today or a future date.');
                 this.value = ''; // Clear the invalid date
@@ -72,9 +90,21 @@
         });
 
         // Set minimum date to today when page loads
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('LastDayOfService').setAttribute('min', today);
+
+            // Clear form if there's a success message (indicating successful submission)
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                // Clear the form fields after successful submission
+                document.getElementById('Username').value = '';
+                document.getElementById('Email').value = '';
+                document.getElementById('Password').value = '';
+                document.getElementById('LastDayOfService').value = '';
+                </text>
+            }
         });
     </script>
 }

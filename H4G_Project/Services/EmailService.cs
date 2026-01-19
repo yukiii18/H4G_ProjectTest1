@@ -391,6 +391,110 @@ namespace H4G_Project.Services
 </html>";
         }
 
+        public async Task<bool> SendStaffAccountCreationEmailAsync(string toEmail, string staffName, string password)
+        {
+            try
+            {
+                // Get email configuration from appsettings.json
+                var smtpHost = _configuration["EmailSettings:SmtpHost"];
+                var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"] ?? "587");
+                var fromEmail = _configuration["EmailSettings:FromEmail"];
+                var fromPassword = _configuration["EmailSettings:FromPassword"];
+                var fromName = _configuration["EmailSettings:FromName"] ?? "MINDS";
+
+                using var client = new SmtpClient(smtpHost, smtpPort)
+                {
+                    Credentials = new NetworkCredential(fromEmail, fromPassword),
+                    EnableSsl = true
+                };
+
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(fromEmail ?? "", fromName),
+                    Subject = "Staff Account Created - Welcome to MINDS Team!",
+                    Body = CreateStaffAccountEmailBody(staffName, toEmail, password),
+                    IsBodyHtml = true
+                };
+
+                mailMessage.To.Add(toEmail);
+
+                await client.SendMailAsync(mailMessage);
+                Console.WriteLine($"Staff account creation email sent successfully to {toEmail}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending staff account creation email: {ex.Message}");
+                return false;
+            }
+        }
+
+        private string CreateStaffAccountEmailBody(string staffName, string email, string password)
+        {
+            return $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+        .header {{ background-color: #007bff; color: white; padding: 20px; text-align: center; }}
+        .content {{ padding: 20px; background-color: #f9f9f9; }}
+        .credentials {{ background-color: #e3f2fd; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0; }}
+        .warning {{ background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0; }}
+        .footer {{ text-align: center; padding: 20px; color: #666; }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h1>🎉 Welcome to the MINDS Team!</h1>
+            <h2>Your Staff Account Has Been Created</h2>
+        </div>
+        
+        <div class='content'>
+            <p>Dear {staffName},</p>
+            
+            <p>Welcome to MINDS! Your staff account has been successfully created and you now have access to the MINDS staff portal.</p>
+            
+            <p>You can now log in to the system using the following credentials:</p>
+            
+            <div class='credentials'>
+                <h3>🔐 Login Credentials</h3>
+                <p><strong>Email:</strong> {email}</p>
+                <p><strong>Password:</strong> {password}</p>
+            </div>
+            
+            <div class='warning'>
+                <h3>⚠️ Important Security Notice</h3>
+                <p><strong>Do remember to reset your password</strong> after your first login for security purposes.</p>
+            </div>
+            
+            <p>As a MINDS staff member, you can now:</p>
+            <ul>
+                <li>Manage volunteer and client applications</li>
+                <li>Create and manage events</li>
+                <li>View reports and analytics</li>
+                <li>Manage user accounts and registrations</li>
+                <li>Access the staff dashboard and tools</li>
+            </ul>
+            
+            <p>If you have any questions about using the system or need assistance with your account, please don't hesitate to contact the IT administrator or your supervisor.</p>
+            
+            <p>We're excited to have you as part of the MINDS team and look forward to working with you to support our mission of helping individuals with intellectual disabilities.</p>
+            
+            <p>Best regards,<br>
+            <strong>MINDS Administration Team</strong></p>
+        </div>
+        
+        <div class='footer'>
+            <p>This is an automated message. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>";
+        }
+
         private string CreateClientRejectionEmailBody(string clientName, string familyMemberName)
         {
             return $@"

@@ -24,10 +24,12 @@ namespace H4G_Project.Controllers
         private readonly ApplicationDAL _applicationContext = new ApplicationDAL();
         private readonly NotificationService _notificationService;
         private readonly NotificationDAL _notificationDAL = new NotificationDAL();
+        private readonly EmailService _emailService;
 
-        public StaffController(NotificationService notificationService)
+        public StaffController(NotificationService notificationService, EmailService emailService)
         {
             _notificationService = notificationService;
+            _emailService = emailService;
         }
 
 
@@ -175,8 +177,19 @@ namespace H4G_Project.Controllers
                     LastDayOfService = string.IsNullOrEmpty(lastDayOfService) ? null : lastDayOfService
                 });
 
-                TempData["SuccessMessage"] = $"Staff account created successfully for {username}.";
-                return RedirectToAction("Index", "Home");
+                // Send welcome email with credentials
+                bool emailSent = await _emailService.SendStaffAccountCreationEmailAsync(email, username, password);
+
+                if (emailSent)
+                {
+                    TempData["SuccessMessage"] = $"Staff account created successfully for {username}. Welcome email sent to {email}.";
+                }
+                else
+                {
+                    TempData["WarningMessage"] = $"Staff account created successfully for {username}, but failed to send welcome email to {email}.";
+                }
+
+                return RedirectToAction("AddNewStaff");
             }
             catch (FirebaseAuthException ex)
             {
