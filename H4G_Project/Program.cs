@@ -12,7 +12,7 @@ if (FirebaseApp.DefaultInstance == null)
     FirebaseApp.Create(new AppOptions
     {
         Credential = GoogleCredential.FromFile(
-            Path.Combine(Directory.GetCurrentDirectory(), "DAL", "config", "squad-60b0b-firebase-adminsdk-fbsvc-582ee8d43f.json")
+            Path.Combine(Directory.GetCurrentDirectory(), "DAL", "config", "squad-60b0b-firebase-adminsdk-fbsvc-cff3f594d5.json")
         )
     });
 }
