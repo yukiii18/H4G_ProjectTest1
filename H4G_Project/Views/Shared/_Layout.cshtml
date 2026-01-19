@@ -4,29 +4,64 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - WebApplication2</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title> MINDS </title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Site CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/WebApplication2.styles.css" asp-append-version="true" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous' defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" defer></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
+
+    <style>
+        /* Sidebar */
+        .sidebar {
+            background-color: #111827;
+        }
+
+        .sidebar-logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+
+        .nav-link {
+            color: #00A5E3;
+            padding: 10px 15px;
+        }
+
+            .nav-link:hover {
+                background-color: #1f2933;
+                color: #ffffff;
+            }
+    </style>
 </head>
 
 <body>
+
+    <!-- Mobile Toggle Button -->
+    <button class="btn btn-dark d-md-none m-2"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#sidebarMenu">
+        ☰ Menu
+    </button>
+
     <div class="container-fluid">
         <div class="row flex-nowrap">
-            <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
-                <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
-                    <a asp-area="" asp-controller="Home" asp-action="Index"
-                        class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                        <span class="fs-5 d-none d-sm-inline">MINDS</span>
+
+            <!-- Sidebar -->
+            <div id="sidebarMenu"
+                 class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 sidebar collapse d-md-block">
+                <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-3 text-white min-vh-100">
+
+                    <a class="navbar-brand mb-3" href="@Url.Action("Index", "Staff")">
+                        <img src="/images/MINDS_logo.png" alt="logo" class="sidebar-logo">
                     </a>
-                    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start"
-                        id="menu">
+
+                    <ul class="nav nav-pills flex-column mb-auto w-100">
 
                         <li class="nav-item">
                             <a asp-area="" asp-controller="Home" asp-action="Create" class="nav-link align-middle px-0">
@@ -43,45 +78,41 @@
                                 a volunteer</span>
                         </a>
                         </li>
-                        <li class="nav-item">
-                            <a asp-area="" asp-controller="Home" asp-action="About" class="nav-link align-middle px-0">
-                                <i class=" fa fa-address-book-o"></i> <span class="ms-1 d-none d-sm-inline">About
-                                    Us</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-area="" asp-controller="Home" asp-action="ContactUs"
-                                class="nav-link align-middle px-0">
-                                <i class=" fa fa-external-link"></i> <span class="ms-1 d-none d-sm-inline">Contact
-                                    Us</span>
-                            </a>
-                        </li>
-                    </ul>
-                    <hr>
 
+                        <li class="nav-item">
+                            <a asp-controller="Home" asp-action="About" class="nav-link">
+                                <i class="fa fa-address-book-o me-2"></i>
+                                <span class="d-none d-sm-inline">About Us</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a asp-controller="Home" asp-action="ContactUs" class="nav-link">
+                                <i class="fa fa-external-link me-2"></i>
+                                <span class="d-none d-sm-inline">Contact Us</span>
+                            </a>
+                        </li>
+
+                    </ul>
+
+                    <hr class="text-secondary w-100">
                 </div>
             </div>
+
+            <!-- Main Content -->
             <div class="col py-3">
-                <div class="container">
-                    <main role="main" class="pb-3">
-                        @RenderBody()
-                    </main>
-                </div>
+                <main role="main" class="container pb-3">
+                    @RenderBody()
+                </main>
             </div>
+
         </div>
     </div>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2023 - WebApplication2 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-</body>
 
+</body>
 </html>
-<!--https://www.codeply.com/p/WGCqYEiPBg-->

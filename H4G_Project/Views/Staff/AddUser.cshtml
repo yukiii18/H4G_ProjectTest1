@@ -5,19 +5,18 @@
     Layout = "~/Views/Shared/_Staff.cshtml";
 }
 
-
-
 <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet">
 
 <style>
 
-    html {
-        background-color: #56baed;
+    html, body {
+        height: 100%;
+        margin: 0;
     }
 
     body {
         font-family: "Poppins", sans-serif;
-        height: 100vh;
+        background-color: #F5F9FC; /* same as staff layout */
     }
 
     a {
@@ -37,7 +36,9 @@
         color: #cccccc;
     }
 
-
+    #formContent {
+        font-family: "Poppins", sans-serif;
+    }
 
     /* STRUCTURE */
 
@@ -47,7 +48,7 @@
         flex-direction: column;
         justify-content: center;
         width: 100%;
-        min-height: 100%;
+        min-height: 100vh;
         padding: 20px;
     }
 

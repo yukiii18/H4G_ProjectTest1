@@ -1,6 +1,6 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿﻿@{
+ViewData["Title"] = "Home Page";
+Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <!-- Google Fonts -->
@@ -112,21 +112,21 @@
         transition: all 0.3s ease-in-out;
     }
 
-    input[type=button]:hover,
-    input[type=submit]:hover,
-    input[type=reset]:hover {
-        background-color: #39ace7;
-    }
+        input[type=button]:hover,
+        input[type=submit]:hover,
+        input[type=reset]:hover {
+            background-color: #39ace7;
+        }
 
-    input[type=button]:active,
-    input[type=submit]:active,
-    input[type=reset]:active {
-        -moz-transform: scale(0.95);
-        -webkit-transform: scale(0.95);
-        -o-transform: scale(0.95);
-        -ms-transform: scale(0.95);
-        transform: scale(0.95);
-    }
+        input[type=button]:active,
+        input[type=submit]:active,
+        input[type=reset]:active {
+            -moz-transform: scale(0.95);
+            -webkit-transform: scale(0.95);
+            -o-transform: scale(0.95);
+            -ms-transform: scale(0.95);
+            transform: scale(0.95);
+        }
 
     input[type=text],
     input[type=email],
@@ -151,18 +151,18 @@
         border-radius: 5px 5px 5px 5px;
     }
 
-    input[type=text],
-    input[type=email],
-    input[type=password]:focus {
-        background-color: #fff;
-        border-bottom: 2px solid #5fbae9;
-    }
+        input[type=text],
+        input[type=email],
+        input[type=password]:focus {
+            background-color: #fff;
+            border-bottom: 2px solid #5fbae9;
+        }
 
-    input[type=text],
-    input[type=email],
-    input[type=password]:placeholder {
-        color: #cccccc;
-    }
+        input[type=text],
+        input[type=email],
+        input[type=password]:placeholder {
+            color: #cccccc;
+        }
 
 
 
@@ -250,29 +250,29 @@
         animation-duration: 1s;
     }
 
-    .fadeIn.first {
-        -webkit-animation-delay: 0.4s;
-        -moz-animation-delay: 0.4s;
-        animation-delay: 0.4s;
-    }
+        .fadeIn.first {
+            -webkit-animation-delay: 0.4s;
+            -moz-animation-delay: 0.4s;
+            animation-delay: 0.4s;
+        }
 
-    .fadeIn.second {
-        -webkit-animation-delay: 0.6s;
-        -moz-animation-delay: 0.6s;
-        animation-delay: 0.6s;
-    }
+        .fadeIn.second {
+            -webkit-animation-delay: 0.6s;
+            -moz-animation-delay: 0.6s;
+            animation-delay: 0.6s;
+        }
 
-    .fadeIn.third {
-        -webkit-animation-delay: 0.8s;
-        -moz-animation-delay: 0.8s;
-        animation-delay: 0.8s;
-    }
+        .fadeIn.third {
+            -webkit-animation-delay: 0.8s;
+            -moz-animation-delay: 0.8s;
+            animation-delay: 0.8s;
+        }
 
-    .fadeIn.fourth {
-        -webkit-animation-delay: 1s;
-        -moz-animation-delay: 1s;
-        animation-delay: 1s;
-    }
+        .fadeIn.fourth {
+            -webkit-animation-delay: 1s;
+            -moz-animation-delay: 1s;
+            animation-delay: 1s;
+        }
 
     /* Simple CSS3 Fade-in Animation */
     .underlineHover:after {
@@ -290,9 +290,9 @@
         color: #0d0d0d;
     }
 
-    .underlineHover:hover:after {
-        width: 100%;
-    }
+        .underlineHover:hover:after {
+            width: 100%;
+        }
 
 
 
@@ -341,119 +341,119 @@
 
 <!-- Firebase SDK -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-// Your Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyBDT4DVv_xmS1C_1WTOpmnlU4WqmqhrOfI",
-    authDomain: "squad-60b0b.firebaseapp.com",
-    projectId: "squad-60b0b",
-    storageBucket: "squad-60b0b.appspot.com",
-    messagingSenderId: "219668334828",
-    appId: "1:219668334828:web:5df0f3df3ed9a17e5a7dc9"
-};
+    // Your Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBDT4DVv_xmS1C_1WTOpmnlU4WqmqhrOfI",
+        authDomain: "squad-60b0b.firebaseapp.com",
+        projectId: "squad-60b0b",
+        storageBucket: "squad-60b0b.appspot.com",
+        messagingSenderId: "219668334828",
+        appId: "1:219668334828:web:5df0f3df3ed9a17e5a7dc9"
+    };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-// ===============================
-// User login
-// ===============================
-window.loginUser = async function() {
-    const email = document.getElementById("memberEmail").value;
-    const password = document.getElementById("memberPassword").value;
+    // ===============================
+    // User login
+    // ===============================
+    window.loginUser = async function() {
+        const email = document.getElementById("memberEmail").value;
+        const password = document.getElementById("memberPassword").value;
 
-    try {
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        const token = await cred.user.getIdToken();
+        try {
+            const cred = await signInWithEmailAndPassword(auth, email, password);
+            const token = await cred.user.getIdToken();
 
-        const response = await fetch("/User/FirebaseLogin", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token })
-        });
+            const response = await fetch("/User/FirebaseLogin", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token })
+            });
 
-        if (response.ok) window.location.href = "/User";
-        else alert("Login failed: invalid user");
-    } catch (err) {
-        console.error(err);
-        alert("Login failed: " + err.message);
-    }
-}
-
-// ===============================
-// Legacy login for existing users
-// ===============================
-window.legacyLoginUser = async function() {
-    const email = document.getElementById("memberEmail").value;
-    const password = document.getElementById("memberPassword").value;
-
-    const formData = new FormData();
-    formData.append("Email", email);
-    formData.append("Password", password);
-
-    try {
-        const response = await fetch("/User/LogInUser", {
-            method: "POST",
-            body: formData
-        });
-
-        if (response.redirected) {
-            window.location.href = response.url;
-        } else {
-            alert("Login failed: invalid credentials");
+            if (response.ok) window.location.href = "/User";
+            else alert("Login failed: invalid user");
+        } catch (err) {
+            console.error(err);
+            alert("Login failed: " + err.message);
         }
-    } catch (err) {
-        console.error(err);
-        alert("Login failed: " + err.message);
     }
-}
 
-// ===============================
-// Staff login
-// ===============================
-window.loginStaff = async function() {
-    const email = document.getElementById("staffEmail").value;
-    const password = document.getElementById("staffPassword").value;
+    // ===============================
+    // Legacy login for existing users
+    // ===============================
+    window.legacyLoginUser = async function() {
+        const email = document.getElementById("memberEmail").value;
+        const password = document.getElementById("memberPassword").value;
 
-    try {
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        const token = await cred.user.getIdToken();
+        const formData = new FormData();
+        formData.append("Email", email);
+        formData.append("Password", password);
 
-        const response = await fetch("/Staff/FirebaseLogin", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token })
-        });
+        try {
+            const response = await fetch("/User/LogInUser", {
+                method: "POST",
+                body: formData
+            });
 
-        if (response.ok) window.location.href = "/Staff";
-        else alert("Login failed: invalid staff");
-    } catch (err) {
-        console.error(err);
-        alert("Login failed: " + err.message);
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                alert("Login failed: invalid credentials");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Login failed: " + err.message);
+        }
     }
-}
+
+    // ===============================
+    // Staff login
+    // ===============================
+    window.loginStaff = async function() {
+        const email = document.getElementById("staffEmail").value;
+        const password = document.getElementById("staffPassword").value;
+
+        try {
+            const cred = await signInWithEmailAndPassword(auth, email, password);
+            const token = await cred.user.getIdToken();
+
+            const response = await fetch("/Staff/FirebaseLogin", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token })
+            });
+
+            if (response.ok) window.location.href = "/Staff";
+            else alert("Login failed: invalid staff");
+        } catch (err) {
+            console.error(err);
+            alert("Login failed: " + err.message);
+        }
+    }
 </script>
 
 <script>
-const memberTab = document.querySelector('h2.User');
-const staffTab = document.querySelector('h2.Staff');
-const memberForm = document.getElementById('memberForm');
-const staffForm = document.getElementById('staffForm');
+    const memberTab = document.querySelector('h2.User');
+    const staffTab = document.querySelector('h2.Staff');
+    const memberForm = document.getElementById('memberForm');
+    const staffForm = document.getElementById('staffForm');
 
-memberTab.addEventListener('click', () => {
-    memberTab.classList.add('active'); memberTab.classList.remove('inactive');
-    staffTab.classList.add('inactive'); staffTab.classList.remove('active');
-    memberForm.style.display = 'block';
-    staffForm.style.display = 'none';
-});
+    memberTab.addEventListener('click', () => {
+        memberTab.classList.add('active'); memberTab.classList.remove('inactive');
+        staffTab.classList.add('inactive'); staffTab.classList.remove('active');
+        memberForm.style.display = 'block';
+        staffForm.style.display = 'none';
+    });
 
-staffTab.addEventListener('click', () => {
-    staffTab.classList.add('active'); staffTab.classList.remove('inactive');
-    memberTab.classList.add('inactive'); memberTab.classList.remove('active');
-    staffForm.style.display = 'block';
-    memberForm.style.display = 'none';
-});
+    staffTab.addEventListener('click', () => {
+        staffTab.classList.add('active'); staffTab.classList.remove('inactive');
+        memberTab.classList.add('inactive'); memberTab.classList.remove('active');
+        staffForm.style.display = 'block';
+        memberForm.style.display = 'none';
+    });
 </script>
