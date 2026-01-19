@@ -18,6 +18,7 @@ if (FirebaseApp.DefaultInstance == null)
 }
 
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<EmailService>();
 
 // Session
 builder.Services.AddDistributedMemoryCache();

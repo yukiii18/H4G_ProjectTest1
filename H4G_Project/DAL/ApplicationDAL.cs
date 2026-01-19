@@ -111,6 +111,7 @@ namespace H4G_Project.DAL
                     {"DisabilityType", application.DisabilityType ?? ""},
                     {"Email", application.Email ?? ""},
                     {"FamilyMemberName", application.FamilyMemberName ?? ""},
+                    {"DateOfBirth", application.DateOfBirth ?? ""}, // Add DateOfBirth field
                     {"Notes", application.Notes ?? ""},
                     {"Occupation", application.Occupation ?? ""},
                     {"MedicalReportUrl", medicalReportUrl ?? ""}, // Firebase Storage URL
@@ -201,32 +202,137 @@ namespace H4G_Project.DAL
         {
             List<Application> applicationList = new List<Application>();
 
-            Query allApplicationsQuery = db.Collection("applicationForms");
-            QuerySnapshot snapshot = await allApplicationsQuery.GetSnapshotAsync();
-
-            foreach (DocumentSnapshot document in snapshot.Documents)
+            try
             {
-                if (document.Exists)
+                Console.WriteLine("=== GETTING ALL APPLICATIONS DEBUG ===");
+                Query allApplicationsQuery = db.Collection("applicationForms");
+                QuerySnapshot snapshot = await allApplicationsQuery.GetSnapshotAsync();
+
+                Console.WriteLine($"Total documents found in applicationForms collection: {snapshot.Documents.Count}");
+
+                foreach (DocumentSnapshot document in snapshot.Documents)
                 {
-                    Application data = document.ConvertTo<Application>();
-                    data.Id = document.Id; // set Firestore document ID
-
-                    // Generate signed URLs for file access
-                    if (!string.IsNullOrEmpty(data.MedicalReportUrl))
+                    if (document.Exists)
                     {
-                        data.MedicalReportUrl = await GenerateSignedUrl(data.MedicalReportUrl);
-                    }
+                        try
+                        {
+                            Console.WriteLine($"Processing document ID: {document.Id}");
 
-                    if (!string.IsNullOrEmpty(data.IdDocumentUrl))
+                            // Manual conversion to handle DateOfBirth field type issues
+                            var data = new Application
+                            {
+                                Id = document.Id,
+                                CaregiverName = GetFieldValueSafely(document, "CaregiverName"),
+                                ContactNumber = GetFieldValueSafely(document, "ContactNumber"),
+                                DisabilityType = GetFieldValueSafely(document, "DisabilityType"),
+                                Email = GetFieldValueSafely(document, "Email"),
+                                FamilyMemberName = GetFieldValueSafely(document, "FamilyMemberName"),
+                                Notes = GetFieldValueSafely(document, "Notes"),
+                                Occupation = GetFieldValueSafely(document, "Occupation"),
+                                MedicalReportUrl = GetFieldValueSafely(document, "MedicalReportUrl"),
+                                IdDocumentUrl = GetFieldValueSafely(document, "IdDocumentUrl"),
+                                Status = GetFieldValueSafely(document, "Status", "Pending")
+                            };
+
+                            Console.WriteLine($"Document {document.Id} - Caregiver: {data.CaregiverName}, Family Member: {data.FamilyMemberName}");
+
+                            // Handle DateOfBirth field - it might be stored as Timestamp or string
+                            try
+                            {
+                                if (document.ContainsField("DateOfBirth"))
+                                {
+                                    var dobValue = document.GetValue<object>("DateOfBirth");
+                                    if (dobValue is Google.Cloud.Firestore.Timestamp timestamp)
+                                    {
+                                        // Convert Timestamp to string in yyyy-MM-dd format
+                                        data.DateOfBirth = timestamp.ToDateTime().ToString("yyyy-MM-dd");
+                                        Console.WriteLine($"Document {document.Id} - DateOfBirth (Timestamp): {data.DateOfBirth}");
+                                    }
+                                    else if (dobValue is string dobString)
+                                    {
+                                        data.DateOfBirth = dobString;
+                                        Console.WriteLine($"Document {document.Id} - DateOfBirth (String): {data.DateOfBirth}");
+                                    }
+                                    else
+                                    {
+                                        data.DateOfBirth = "";
+                                        Console.WriteLine($"Document {document.Id} - DateOfBirth: Unknown type, set to empty");
+                                    }
+                                }
+                                else
+                                {
+                                    data.DateOfBirth = "";
+                                    Console.WriteLine($"Document {document.Id} - DateOfBirth: Field not found, set to empty");
+                                }
+                            }
+                            catch (Exception dobEx)
+                            {
+                                Console.WriteLine($"Error processing DateOfBirth for document {document.Id}: {dobEx.Message}");
+                                data.DateOfBirth = "";
+                            }
+
+                            // Generate signed URLs for file access
+                            if (!string.IsNullOrEmpty(data.MedicalReportUrl))
+                            {
+                                data.MedicalReportUrl = await GenerateSignedUrl(data.MedicalReportUrl);
+                            }
+
+                            if (!string.IsNullOrEmpty(data.IdDocumentUrl))
+                            {
+                                data.IdDocumentUrl = await GenerateSignedUrl(data.IdDocumentUrl);
+                            }
+
+                            applicationList.Add(data);
+                            Console.WriteLine($"Successfully added document {document.Id} to list");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"ERROR processing document {document.Id}: {ex.Message}");
+                            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                            // Skip this document and continue with others
+                            continue;
+                        }
+                    }
+                    else
                     {
-                        data.IdDocumentUrl = await GenerateSignedUrl(data.IdDocumentUrl);
+                        Console.WriteLine($"Document {document.Id} does not exist, skipping");
                     }
-
-                    applicationList.Add(data);
                 }
+
+                Console.WriteLine($"Total applications successfully retrieved: {applicationList.Count}");
+                Console.WriteLine("=== END GETTING ALL APPLICATIONS DEBUG ===");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR in GetAllApplications: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
             }
 
             return applicationList;
+        }
+
+        /// <summary>
+        /// Safely get field value from document, returning empty string if field doesn't exist
+        /// </summary>
+        private string GetFieldValueSafely(DocumentSnapshot document, string fieldName, string defaultValue = "")
+        {
+            try
+            {
+                if (document.ContainsField(fieldName))
+                {
+                    return document.GetValue<string>(fieldName) ?? defaultValue;
+                }
+                else
+                {
+                    Console.WriteLine($"Field '{fieldName}' not found in document {document.Id}, using default value");
+                    return defaultValue;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting field '{fieldName}' from document {document.Id}: {ex.Message}");
+                return defaultValue;
+            }
         }
 
         public async Task<List<VolunteerApplication>> GetAllVolunteerApplications()
@@ -301,6 +407,29 @@ namespace H4G_Project.DAL
             catch (Exception ex)
             {
                 Console.WriteLine($"Error updating application status: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Update volunteer application status
+        /// </summary>
+        public async Task<bool> UpdateVolunteerApplicationStatus(string applicationId, string status)
+        {
+            try
+            {
+                DocumentReference docRef = db.Collection("volunteerApplicationForms").Document(applicationId);
+                Dictionary<string, object> updates = new()
+                        {
+                            {"Status", status}
+                        };
+
+                await docRef.UpdateAsync(updates);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating volunteer application status: {ex.Message}");
                 return false;
             }
         }

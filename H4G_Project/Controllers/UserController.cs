@@ -54,8 +54,7 @@ namespace H4G_Project.Controllers
 
 
 
-            // ✅ Find current user registration
-            string? userEmail = HttpContext.Session.GetString("UserEmail");
+            string userEmail = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
             if (string.IsNullOrEmpty(userEmail))
                 return Json(new { success = false, message = "User not logged in" });
 
@@ -77,7 +76,7 @@ namespace H4G_Project.Controllers
 
         public class QRAttendanceRequest
         {
-            public string QrCode { get; set; }
+            public string QrCode { get; set; } = string.Empty;
         }
 
 
@@ -87,16 +86,16 @@ namespace H4G_Project.Controllers
         // ===============================
         public async Task<IActionResult> Index()
         {
-            string email = HttpContext.Session.GetString("UserEmail");
-            if (email == null) return RedirectToAction("Index", "Home");
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrEmpty(email)) return RedirectToAction("Index", "Home");
 
-            User user = await _userContext.GetUserByEmail(email);
+            User? user = await _userContext.GetUserByEmail(email);
             ViewBag.UserRole = HttpContext.Session.GetString("UserRole") ?? "Participant";
 
             // Get engagement usage information for participants
             if (user != null && user.Role == "Participant")
             {
-                var (canRegister, currentCount, limit, message) = await _eventsDAL.CheckUserEngagementLimit(email, user.EngagementType, null);
+                var (canRegister, currentCount, limit, message) = await _eventsDAL.CheckUserEngagementLimit(email, user.EngagementType ?? "Ad hoc engagement", null);
                 ViewBag.EngagementUsage = new
                 {
                     CurrentCount = currentCount,
@@ -114,7 +113,7 @@ namespace H4G_Project.Controllers
         // ===============================
         public class FirebaseTokenRequest
         {
-            public string Token { get; set; }
+            public string Token { get; set; } = string.Empty;
         }
 
         [HttpPost]
@@ -126,13 +125,20 @@ namespace H4G_Project.Controllers
             try
             {
                 var decoded = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(request.Token);
-                string email = decoded.Claims["email"].ToString();
+                string email = decoded.Claims["email"]?.ToString() ?? string.Empty;
 
-                User user = await _userContext.GetUserByEmail(email);
+                User? user = await _userContext.GetUserByEmail(email);
                 if (user == null) return Unauthorized();
 
-                HttpContext.Session.SetString("Username", user.Username);
-                HttpContext.Session.SetString("UserEmail", user.Email);
+                // Check if user is deactivated (has LastDayOfService set)
+                if (!string.IsNullOrEmpty(user.LastDayOfService))
+                {
+                    Console.WriteLine($"BLOCKING LOGIN - User access denied - deactivated on {user.LastDayOfService}");
+                    return Unauthorized("Access denied. Your account has been deactivated.");
+                }
+
+                HttpContext.Session.SetString("Username", user.Username ?? string.Empty);
+                HttpContext.Session.SetString("UserEmail", user.Email ?? string.Empty);
                 HttpContext.Session.SetString("UserRole", user.Role ?? "Participant");
 
                 return Ok();
@@ -151,16 +157,24 @@ namespace H4G_Project.Controllers
         public async Task<ActionResult> LogInUser(IFormCollection form)
         {
             // Retrieve the user from the database by the email
-            User user = await _userContext.GetUserByEmail(form["Email"]);
+            User? user = await _userContext.GetUserByEmail(form["Email"].ToString() ?? string.Empty);
 
             if (user != null)
             {
+                // Check if user is deactivated (has LastDayOfService set)
+                if (!string.IsNullOrEmpty(user.LastDayOfService))
+                {
+                    Console.WriteLine($"BLOCKING LOGIN - User access denied - deactivated on {user.LastDayOfService}");
+                    ModelState.AddModelError(string.Empty, "Access denied. Your account has been deactivated.");
+                    return RedirectToAction("Index", "Home");
+                }
+
                 // TEMPORARY: Skip password check for testing
                 // TODO: Remove this once users are migrated to Firebase Auth
-                HttpContext.Session.SetString("Username", user.Username);
-                HttpContext.Session.SetString("UserEmail", user.Email);
+                HttpContext.Session.SetString("Username", user.Username ?? string.Empty);
+                HttpContext.Session.SetString("UserEmail", user.Email ?? string.Empty);
                 HttpContext.Session.SetString("UserRole", user.Role ?? "Participant");
-                TempData["Username"] = user.Username;
+                TempData["Username"] = user.Username ?? string.Empty;
                 TempData.Keep("Username");
                 return RedirectToAction("Index", "User");
             }
@@ -257,7 +271,7 @@ namespace H4G_Project.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewAllEvents()
         {
-            string userEmail = HttpContext.Session.GetString("UserEmail");
+            string userEmail = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
             if (string.IsNullOrEmpty(userEmail))
                 return RedirectToAction("Index", "Home");
 
@@ -293,7 +307,7 @@ namespace H4G_Project.Controllers
 
         // Add comment or reply
         [HttpPost]
-        public async Task<IActionResult> AddComment(string eventId, string comment, string parentCommentId = null)
+        public async Task<IActionResult> AddComment(string eventId, string comment, string? parentCommentId = null)
         {
             if (string.IsNullOrEmpty(comment) || string.IsNullOrEmpty(eventId))
             {
@@ -315,7 +329,7 @@ namespace H4G_Project.Controllers
         {
             try
             {
-                string email = HttpContext.Session.GetString("UserEmail");
+                string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
                 Console.WriteLine($"GetNotifications called for email: {email}");
 
                 if (string.IsNullOrEmpty(email))
@@ -358,7 +372,7 @@ namespace H4G_Project.Controllers
         {
             try
             {
-                string email = HttpContext.Session.GetString("UserEmail");
+                string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
                 if (string.IsNullOrEmpty(email))
                 {
                     return Json(0);
@@ -396,7 +410,7 @@ namespace H4G_Project.Controllers
         {
             try
             {
-                string email = HttpContext.Session.GetString("UserEmail");
+                string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
                 if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized();
@@ -424,7 +438,7 @@ namespace H4G_Project.Controllers
         {
             try
             {
-                string email = HttpContext.Session.GetString("UserEmail");
+                string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
                 if (string.IsNullOrEmpty(email))
                 {
                     return Json(new { success = false, message = "Not logged in" });
@@ -492,7 +506,7 @@ namespace H4G_Project.Controllers
                 }
 
                 // Clear LastDayOfService to reactivate the user
-                bool success = await _userContext.UpdateUserLastDayOfService(email, null);
+                bool success = await _userContext.UpdateUserLastDayOfService(email, null!);
 
                 return Json(new
                 {

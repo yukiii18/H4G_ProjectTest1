@@ -19,6 +19,16 @@
     </div>
 }
 
+@if (TempData["WarningMessage"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @TempData["WarningMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
 @if (TempData["ErrorMessage"] != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -112,7 +122,7 @@
                         <td>@r.Notes</td>
                         <td>
                             <a href="javascript:void(0);" class="text-primary"
-                                onclick="showClientDetails('@r.Id', '@r.Name', '', '', '@r.Notes', '@r.Email', '@r.ContactNumber', '@r.Occupation', '@(r.Status ?? "Pending")')">
+                                onclick="showClientDetails('@r.Id', '@r.Name', '@(r.DateOfBirth ?? "")', '', '@r.Notes', '@r.Email', '@r.ContactNumber', '@r.Occupation', '@(r.Status ?? "Pending")')">
                                 View Details
                             </a>
                         </td>
@@ -167,12 +177,14 @@
         let currentApplicationId = '';
         let currentApplicantName = '';
         let currentApplicantEmail = '';
+        let currentDateOfBirth = '';
 
         // Client Application Functions
         function showClientDetails(applicationId, name, dateOfBirth, unused2, notes, email, contact, occupation, status, resumeUrl) {
             currentApplicationId = applicationId;
             currentApplicantName = name;
             currentApplicantEmail = email;
+            currentDateOfBirth = dateOfBirth;
 
             document.getElementById("clientDetailFamilyMember").innerText = name;
             document.getElementById("clientDetailNotes").innerText = notes;
@@ -206,7 +218,7 @@
 
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = '/Application/ApproveApplication';
+            form.action = '/Application/ApproveVolunteerApplication';
 
             const token = document.querySelector('input[name="__RequestVerificationToken"]');
             if (token) {
@@ -225,15 +237,21 @@
 
             const nameInput = document.createElement('input');
             nameInput.type = 'hidden';
-            nameInput.name = 'applicantName';
+            nameInput.name = 'volunteerName';
             nameInput.value = currentApplicantName;
             form.appendChild(nameInput);
 
             const emailInput = document.createElement('input');
             emailInput.type = 'hidden';
-            emailInput.name = 'applicantEmail';
+            emailInput.name = 'volunteerEmail';
             emailInput.value = currentApplicantEmail;
             form.appendChild(emailInput);
+
+            const dobInput = document.createElement('input');
+            dobInput.type = 'hidden';
+            dobInput.name = 'dateOfBirth';
+            dobInput.value = currentDateOfBirth;
+            form.appendChild(dobInput);
 
             document.body.appendChild(form);
             form.submit();
@@ -249,7 +267,7 @@
 
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = '/Application/RejectApplication';
+            form.action = '/Application/RejectVolunteerApplication';
 
             const token = document.querySelector('input[name="__RequestVerificationToken"]');
             if (token) {
@@ -268,9 +286,15 @@
 
             const nameInput = document.createElement('input');
             nameInput.type = 'hidden';
-            nameInput.name = 'applicantName';
+            nameInput.name = 'volunteerName';
             nameInput.value = currentApplicantName;
             form.appendChild(nameInput);
+
+            const emailInput = document.createElement('input');
+            emailInput.type = 'hidden';
+            emailInput.name = 'volunteerEmail';
+            emailInput.value = currentApplicantEmail;
+            form.appendChild(emailInput);
 
             document.body.appendChild(form);
             form.submit();

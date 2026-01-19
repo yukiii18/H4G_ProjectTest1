@@ -110,7 +110,7 @@
                         <td>@r.Notes</td>
                         <td>
                             <a href="javascript:void(0);" class="text-primary"
-                                onclick="showClientDetails('@r.Id', '@r.FamilyMemberName', '@r.DisabilityType', '@r.CaregiverName', '@r.Notes', '@r.Email', '@r.ContactNumber', '@r.Occupation', '@(r.Status ?? "Pending")', '@r.MedicalReportUrl', '@r.IdDocumentUrl')">
+                                onclick="showClientDetails('@r.Id', '@r.FamilyMemberName', '@r.DisabilityType', '@r.CaregiverName', '@r.Notes', '@r.Email', '@r.ContactNumber', '@r.Occupation', '@(r.Status ?? "Pending")', '@r.MedicalReportUrl', '@r.IdDocumentUrl', '@r.DateOfBirth')">
                                 View Details
                             </a>
                         </td>
@@ -192,14 +192,18 @@
         let currentApplicationId = '';
         let currentApplicantName = '';
         let currentApplicantEmail = '';
+        let currentFamilyMemberName = '';
+        let currentDateOfBirth = '';
         let currentMedicalReportUrl = '';
         let currentIdDocumentUrl = '';
 
         // Client Application Functions
-        function showClientDetails(applicationId, familyMember, disability, caregiver, notes, email, contact, occupation, status, medicalReportUrl, idDocumentUrl) {
+        function showClientDetails(applicationId, familyMember, disability, caregiver, notes, email, contact, occupation, status, medicalReportUrl, idDocumentUrl, dateOfBirth) {
             currentApplicationId = applicationId;
-            currentApplicantName = familyMember;
+            currentApplicantName = caregiver; // Caregiver is the applicant
+            currentFamilyMemberName = familyMember; // Family member is the client
             currentApplicantEmail = email;
+            currentDateOfBirth = dateOfBirth || ''; // Store date of birth
             currentMedicalReportUrl = medicalReportUrl || '/file/report123.pdf'; // fallback
             currentIdDocumentUrl = idDocumentUrl || '/file/report123.pdf'; // fallback
 
@@ -272,6 +276,15 @@
                 return;
             }
 
+            // Debug: Log the current values
+            console.log("=== CLIENT APPROVAL DEBUG ===");
+            console.log("Application ID:", currentApplicationId);
+            console.log("Applicant Name:", currentApplicantName);
+            console.log("Applicant Email:", currentApplicantEmail);
+            console.log("Family Member Name:", currentFamilyMemberName);
+            console.log("Date of Birth:", currentDateOfBirth);
+            console.log("==============================");
+
             $('#clientDetailsModal').modal('hide');
 
             const form = document.createElement('form');
@@ -304,6 +317,25 @@
             emailInput.name = 'applicantEmail';
             emailInput.value = currentApplicantEmail;
             form.appendChild(emailInput);
+
+            const familyMemberInput = document.createElement('input');
+            familyMemberInput.type = 'hidden';
+            familyMemberInput.name = 'familyMemberName';
+            familyMemberInput.value = currentFamilyMemberName;
+            form.appendChild(familyMemberInput);
+
+            const dateOfBirthInput = document.createElement('input');
+            dateOfBirthInput.type = 'hidden';
+            dateOfBirthInput.name = 'dateOfBirth';
+            dateOfBirthInput.value = currentDateOfBirth;
+            form.appendChild(dateOfBirthInput);
+
+            // Debug: Log form data before submission
+            console.log("Form data being submitted:");
+            const formData = new FormData(form);
+            for (let [key, value] of formData.entries()) {
+                console.log(key + ": " + value);
+            }
 
             document.body.appendChild(form);
             form.submit();
@@ -341,6 +373,18 @@
             nameInput.name = 'applicantName';
             nameInput.value = currentApplicantName;
             form.appendChild(nameInput);
+
+            const emailInput = document.createElement('input');
+            emailInput.type = 'hidden';
+            emailInput.name = 'applicantEmail';
+            emailInput.value = currentApplicantEmail;
+            form.appendChild(emailInput);
+
+            const familyMemberInput = document.createElement('input');
+            familyMemberInput.type = 'hidden';
+            familyMemberInput.name = 'familyMemberName';
+            familyMemberInput.value = currentFamilyMemberName;
+            form.appendChild(familyMemberInput);
 
             document.body.appendChild(form);
             form.submit();
@@ -389,18 +433,18 @@
         function searchClientTable() {
             filterClientTable(); // Reuse the existing filter logic
         }
-          function clearAllFilters() {
-                // Clear search input
-                document.getElementById("searchInput").value = "";
+        function clearAllFilters() {
+            // Clear search input
+            document.getElementById("searchInput").value = "";
 
-                // Reset disability filter
-                document.getElementById("disabilityFilter").selectedIndex = 0;
+            // Reset disability filter
+            document.getElementById("disabilityFilter").selectedIndex = 0;
 
-                // Reset status filter
-                document.getElementById("clientStatusFilter").selectedIndex = 0;
+            // Reset status filter
+            document.getElementById("clientStatusFilter").selectedIndex = 0;
 
-                // Reapply filters (which will show all rows since filters are cleared)
-                filterClientTable();
-            }
-        </script>
+            // Reapply filters (which will show all rows since filters are cleared)
+            filterClientTable();
+        }
+    </script>
 }

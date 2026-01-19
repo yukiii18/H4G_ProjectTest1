@@ -1,5 +1,4 @@
 ﻿using Google.Cloud.Firestore;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace H4G_Project.Models
@@ -9,7 +8,7 @@ namespace H4G_Project.Models
     {
         // Firestore document ID (not stored in Firestore)
         [FirestoreDocumentId]
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
 
         [FirestoreProperty("eventID")]
         public int eventID { get; set; }
@@ -17,13 +16,13 @@ namespace H4G_Project.Models
         [FirestoreProperty("name")]
         [Required(ErrorMessage = "Event name is required")]
         [StringLength(100)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [FirestoreProperty("details")]
-        public string Details { get; set; }
+        public string Details { get; set; } = string.Empty;
 
         [FirestoreProperty("eventPhoto")]
-        public string eventPhoto { get; set; }
+        public string eventPhoto { get; set; } = string.Empty;
 
         [FirestoreProperty("start")]
         [Required]
@@ -43,6 +42,6 @@ namespace H4G_Project.Models
 
         // unique for each event ;>
         [FirestoreProperty("qrCode")]
-        public string QrCode { get; set; }
+        public string QrCode { get; set; } = string.Empty;
     }
 }

@@ -174,7 +174,7 @@
                     // Normalize role to have first letter capitalized
                     role = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
                     
-                    // Step 2: Show registration form based on role
+                    // Show registration form based on role
                     const volunteerFields = role === 'Volunteer' ? `
                         <div class="form-group text-left mt-2">
                             <label>Last 4 characters of NRIC *</label>
@@ -569,7 +569,7 @@
                 }
 
                 function submitRegistration(registrationData) {
-                    // Step 3: Submit registration
+                    // Submit registration
                     fetch('/Calendar/Register', {
                         method: 'POST',
                         headers: {
@@ -619,7 +619,7 @@
                 }
 
                 function showPaymentModal(registrationId, qrCode, amount, successMessage = '') {
-                    // Step 4: Show mock QR code for payment
+                    // Show mock QR code for payment
                     Swal.fire({
                         title: 'Payment Required',
                         html: `
@@ -643,7 +643,7 @@
                 }
 
                 function confirmPayment(registrationId, qrCode) {
-                    // Step 5: Confirm payment and update database
+                    // Confirm payment and update database
                     fetch('/Calendar/ConfirmPayment', {
                         method: 'POST',
                         headers: {

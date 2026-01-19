@@ -7,25 +7,25 @@ namespace H4G_Project.Models
     public class Notification
     {
         [FirestoreDocumentId]
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
 
         [FirestoreProperty]
         [Required]
-        public string UserId { get; set; } // User email who should receive the notification
+        public string UserId { get; set; } = string.Empty; // User email who should receive the notification
 
         [FirestoreProperty]
         [Required]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [FirestoreProperty]
         [Required]
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
 
         [FirestoreProperty]
-        public string EventId { get; set; } // Related event ID
+        public string EventId { get; set; } = string.Empty; // Related event ID
 
         [FirestoreProperty]
-        public string EventName { get; set; } // Event name for easy display
+        public string EventName { get; set; } = string.Empty; // Event name for easy display
 
         [FirestoreProperty]
         public string Type { get; set; } = "comment"; // notification type: comment, event_update, etc.
@@ -37,6 +37,6 @@ namespace H4G_Project.Models
         public Timestamp CreatedAt { get; set; }
 
         [FirestoreProperty]
-        public string CreatedBy { get; set; } // Staff member who created the notification
+        public string CreatedBy { get; set; } = string.Empty; // Staff member who created the notification
     }
 }

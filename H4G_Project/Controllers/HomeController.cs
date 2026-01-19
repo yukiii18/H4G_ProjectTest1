@@ -53,10 +53,18 @@ namespace H4G_Project.Controllers
                 {
                     Console.WriteLine($"User found: {user.Email}, Username: {user.Username}, Role: {user.Role}");
 
+                    // Check if user is deactivated (has LastDayOfService set)
+                    if (!string.IsNullOrEmpty(user.LastDayOfService))
+                    {
+                        Console.WriteLine($"BLOCKING LOGIN - User access denied - deactivated on {user.LastDayOfService}");
+                        TempData["MemberMessage"] = "Access denied. Your account has been deactivated.";
+                        return RedirectToAction("Index", "Home");
+                    }
+
                     // Set proper session variables for user
-                    HttpContext.Session.SetString("UserEmail", user.Email);
-                    HttpContext.Session.SetString("Username", user.Username);
-                    HttpContext.Session.SetString("UserRole", user.Role);
+                    HttpContext.Session.SetString("UserEmail", user.Email ?? string.Empty);
+                    HttpContext.Session.SetString("Username", user.Username ?? string.Empty);
+                    HttpContext.Session.SetString("UserRole", user.Role ?? "Participant");
 
                     Console.WriteLine($"User logged in: {user.Email} ({user.Role})");
                     return RedirectToAction("Index", "User");
@@ -116,8 +124,8 @@ namespace H4G_Project.Controllers
                     }
 
                     // Set proper session variables for staff
-                    HttpContext.Session.SetString("StaffEmail", staff.Email);
-                    HttpContext.Session.SetString("StaffUsername", staff.Username);
+                    HttpContext.Session.SetString("StaffEmail", staff.Email ?? string.Empty);
+                    HttpContext.Session.SetString("StaffUsername", staff.Username ?? string.Empty);
                     HttpContext.Session.SetString("UserRole", "Staff");
 
                     Console.WriteLine($"Staff logged in: {staff.Email} (Staff)");
