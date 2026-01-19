@@ -372,11 +372,13 @@ namespace H4G_Project.Controllers
         // ADD USER
         // ===============================
         [HttpGet]
-        public IActionResult AddUser(string applicantName = "", string applicantEmail = "", string applicationId = "")
+        public IActionResult AddUser(string applicantName = "", string applicantEmail = "", string applicantPhone = "", string applicantDateOfBirth = "", string applicationId = "")
         {
             // Pass application data to view for pre-population
             ViewBag.ApplicantName = applicantName;
             ViewBag.ApplicantEmail = applicantEmail;
+            ViewBag.ApplicantPhone = applicantPhone;
+            ViewBag.ApplicantDateOfBirth = applicantDateOfBirth;
             ViewBag.ApplicationId = applicationId;
             return View();
         }
@@ -386,6 +388,8 @@ namespace H4G_Project.Controllers
         {
             string username = form["Username"];
             string email = form["Email"];
+            string phoneNumber = form["PhoneNumber"]; // Add phone number
+            string dateOfBirth = form["DateOfBirth"]; // Add date of birth
             string role = form["Role"];
             string password = form["Password"]; // Get password from form
             string applicationId = form["ApplicationId"]; // Hidden field from the form
@@ -414,6 +418,8 @@ namespace H4G_Project.Controllers
                 {
                     Username = username,
                     Email = email,
+                    PhoneNumber = phoneNumber, // Add phone number
+                    DateOfBirth = dateOfBirth, // Add date of birth
                     Role = role,
                     LastDayOfService = null // Explicitly set to null for new users
                 });

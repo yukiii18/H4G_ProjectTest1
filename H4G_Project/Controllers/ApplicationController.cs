@@ -200,11 +200,16 @@ namespace H4G_Project.Controllers
         {
             try
             {
+                // Get the full application to retrieve phone number
+                var application = await applicationContext.GetApplicationByEmail(applicantEmail);
+                string applicantPhone = application?.ContactNumber ?? "";
+
                 // Debug: Log the received parameters
                 Console.WriteLine($"=== CLIENT APPLICATION APPROVAL DEBUG ===");
                 Console.WriteLine($"Application ID: {applicationId}");
                 Console.WriteLine($"Applicant Name: {applicantName}");
                 Console.WriteLine($"Applicant Email: {applicantEmail}");
+                Console.WriteLine($"Applicant Phone: {applicantPhone}");
                 Console.WriteLine($"Family Member Name: {familyMemberName}");
                 Console.WriteLine($"Date of Birth: {dateOfBirth}");
                 Console.WriteLine($"==========================================");
@@ -219,6 +224,8 @@ namespace H4G_Project.Controllers
                 {
                     Username = applicantName, // Caregiver name as username
                     Email = applicantEmail,
+                    PhoneNumber = applicantPhone, // Add phone number from application
+                    DateOfBirth = application?.DateOfBirth ?? "", // Add date of birth from application
                     Role = "participant", // Role for clients/participants (lowercase)
                     EngagementType = "Ad hoc engagement", // Engagement type for clients
                     LastDayOfService = string.Empty // Active user
@@ -357,6 +364,14 @@ namespace H4G_Project.Controllers
         {
             try
             {
+                // Get the full volunteer application to retrieve phone number and date of birth
+                var volunteerApplication = await applicationContext.GetVolunteerApplicationById(applicationId);
+                if (volunteerApplication == null)
+                {
+                    TempData["ErrorMessage"] = "Volunteer application not found.";
+                    return RedirectToAction("VolunteerApplications");
+                }
+
                 // Generate password: name + date of birth
                 string password = GenerateVolunteerPassword(volunteerName, dateOfBirth);
 
@@ -366,6 +381,8 @@ namespace H4G_Project.Controllers
                 {
                     Username = volunteerName,
                     Email = volunteerEmail,
+                    PhoneNumber = volunteerApplication.ContactNumber, // Add phone number from application
+                    DateOfBirth = volunteerApplication.DateOfBirth, // Add date of birth from application
                     Role = "Volunteer",
                     EngagementType = "Ad hoc engagement", // Default for volunteers
                     LastDayOfService = string.Empty // Active user

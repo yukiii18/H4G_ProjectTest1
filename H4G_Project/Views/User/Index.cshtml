@@ -229,12 +229,13 @@
                         </div>
                         <div class="form-group text-left mt-2">
                             <label>Date of Birth *</label>
-                            <input type="date" id="DateOfBirth" class="form-control" required />
+                            <input type="date" id="DateOfBirth" class="form-control" value="@Model.DateOfBirth" readonly required />
+                            <small class="text-muted">Pre-filled from your account</small>
                         </div>
                         <div class="form-group text-left mt-2">
                             <label>Mobile Number *</label>
-                            <input type="tel" id="MobileNumber" class="form-control" maxlength="8" placeholder="12345678" required />
-                            <small class="text-muted">8 digits only</small>
+                            <input type="tel" id="MobileNumber" class="form-control" maxlength="8" placeholder="12345678" value="@Model.PhoneNumber" readonly required />
+                            <small class="text-muted">Pre-filled from your account</small>
                         </div>
                         <div class="form-group text-left mt-2">
                             <label>Citizenship Type *</label>
@@ -280,8 +281,8 @@
                         <div class="form-group text-left mt-2">
                             <label>Phone Number *</label>
                             <input type="tel" id="PhoneNumber" class="form-control" 
-                                   placeholder="12345678" maxlength="8" required />
-                            <small class="text-muted">8 digits only</small>
+                                   placeholder="12345678" maxlength="8" value="@Model.PhoneNumber" readonly required />
+                            <small class="text-muted">Pre-filled from your account</small>
                             <small class="text-danger" id="phoneError" style="display:none;">Please enter exactly 8 digits only</small>
                         </div>
                         <div class="form-group text-left mt-2">
@@ -327,7 +328,8 @@
 
                                     <div class="form-group text-left mt-2">
                                         <label>Full Name *</label>
-                                        <input type="text" id="FullName" class="form-control" required />
+                                        <input type="text" id="FullName" class="form-control" value="@Model.Username" required />
+                                        <small class="text-muted">Pre-filled from your account (you can edit this)</small>
                                         <small class="text-danger" id="nameError" style="display:none;">Please enter your full name</small>
                                     </div>
 
@@ -365,24 +367,8 @@
 
                             // Add validation for volunteer mobile number and declarations
                             if (role === 'Volunteer') {
-                                const mobileInput = document.getElementById('MobileNumber');
-                                const mobileError = document.createElement('small');
-                                mobileError.className = 'text-danger';
-                                mobileError.style.display = 'none';
-                                mobileError.textContent = 'Please enter exactly 8 digits only';
-                                mobileInput.parentNode.appendChild(mobileError);
-
-                                mobileInput.addEventListener('blur', function() {
-                                    const mobileRegex = /^\d{8}$/;
-                                    if (this.value && !mobileRegex.test(this.value)) {
-                                        mobileError.style.display = 'block';
-                                        this.classList.add('is-invalid');
-                                    } else {
-                                        mobileError.style.display = 'none';
-                                        this.classList.remove('is-invalid');
-                                    }
-                                });
-
+                                // Mobile number is now readonly and prefilled, so no validation needed
+                                
                                 // Add real-time validation for declarations
                                 const declarationCheckboxes = ['SecurityScreening', 'Confidentiality', 'CodeOfConduct', 'PDPA'];
                                 const declarationError = document.getElementById('declarationError');
@@ -400,25 +386,7 @@
                                     });
                                 });
                             } else if (role === 'Participant') {
-                                // Add phone validation for participants (required)
-                                const phoneInput = document.getElementById('PhoneNumber');
-                                const phoneError = document.getElementById('phoneError');
-
-                                phoneInput.addEventListener('blur', function() {
-                                    const phoneRegex = /^\d{8}$/;
-                                    if (!this.value.trim()) {
-                                        phoneError.textContent = 'Phone number is required';
-                                        phoneError.style.display = 'block';
-                                        this.classList.add('is-invalid');
-                                    } else if (!phoneRegex.test(this.value)) {
-                                        phoneError.textContent = 'Please enter exactly 8 digits only';
-                                        phoneError.style.display = 'block';
-                                        this.classList.add('is-invalid');
-                                    } else {
-                                        phoneError.style.display = 'none';
-                                        this.classList.remove('is-invalid');
-                                    }
-                                });
+                                // Phone number is readonly and prefilled for participants too, so no validation needed
 
                                 // Add validation for emergency contact name (required)
                                 const emergencyContactNameInput = document.getElementById('EmergencyContactName');
@@ -559,20 +527,9 @@
                                     return false;
                                 }
 
-                                // Validate phone number (required for participants)
-                                if (!phoneNumber) {
-                                    Swal.showValidationMessage('Phone number is required');
-                                    return false;
-                                }
-
-                                // Validate phone number format - exactly 8 digits (numbers only)
+                                // Phone number is prefilled and readonly, so no validation needed
+                                // But we still validate emergency contact number format - exactly 8 digits (numbers only)
                                 const phoneRegex = /^\d{8}$/;
-                                if (!phoneRegex.test(phoneNumber)) {
-                                    Swal.showValidationMessage('Please enter a valid phone number (8 digits only)');
-                                    return false;
-                                }
-
-                                // Validate emergency contact number format - exactly 8 digits (numbers only)
                                 if (!phoneRegex.test(emergencyContactNumber)) {
                                     Swal.showValidationMessage('Please enter a valid emergency contact number (8 digits only)');
                                     return false;

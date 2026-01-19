@@ -66,6 +66,8 @@ namespace H4G_Project.DAL
                 {
                     { "Username", user.Username },
                     { "Email", user.Email },
+                    { "PhoneNumber", user.PhoneNumber ?? "" }, // Add phone number field
+                    { "DateOfBirth", user.DateOfBirth ?? "" }, // Add date of birth field
                     { "Role", user.Role },
                     { "EngagementType", user.EngagementType ?? "Ad hoc engagement" }, // Default engagement type
                     { "LastDayOfService", user.LastDayOfService ?? null } // Default to null

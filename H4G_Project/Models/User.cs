@@ -18,6 +18,16 @@ namespace H4G_Project.Models
         [EmailAddress]
         public string? Email { get; set; } = string.Empty;
 
+        [FirestoreProperty("PhoneNumber")]
+        [Display(Name = "Phone Number")]
+        [Phone(ErrorMessage = "Invalid phone number")]
+        public string? PhoneNumber { get; set; } = string.Empty;
+
+        [FirestoreProperty("DateOfBirth")]
+        [Display(Name = "Date of Birth")]
+        [DataType(DataType.Date)]
+        public string? DateOfBirth { get; set; } = string.Empty;
+
         [FirestoreProperty("Role")]
         [Display(Name = "Role")]
         [Required]

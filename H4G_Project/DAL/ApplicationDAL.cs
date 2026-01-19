@@ -435,6 +435,39 @@ namespace H4G_Project.DAL
         }
 
         /// <summary>
+        /// Get volunteer application by ID
+        /// </summary>
+        public async Task<VolunteerApplication> GetVolunteerApplicationById(string applicationId)
+        {
+            try
+            {
+                DocumentReference docRef = db.Collection("volunteerApplicationForms").Document(applicationId);
+                DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+
+                if (snapshot.Exists)
+                {
+                    VolunteerApplication data = snapshot.ConvertTo<VolunteerApplication>();
+                    data.Id = snapshot.Id;
+
+                    // Generate signed URLs for file access
+                    if (!string.IsNullOrEmpty(data.ResumeUrl))
+                    {
+                        data.ResumeUrl = await GenerateSignedUrl(data.ResumeUrl);
+                    }
+
+                    return data;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting volunteer application by ID: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Get application by email
         /// </summary>
         public async Task<Application> GetApplicationByEmail(string email)
