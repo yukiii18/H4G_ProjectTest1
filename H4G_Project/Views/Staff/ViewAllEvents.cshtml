@@ -4,7 +4,7 @@
 
 @{
     ViewData["Title"] = "All Events";
-    Layout = "~/Views/Shared/_Member.cshtml";
+    Layout = "~/Views/Shared/_Staff.cshtml";
     var eventComments = ViewBag.EventComments as Dictionary<string, List<CommentVM>> ?? new Dictionary<string, List<CommentVM>>();
 }
 
@@ -13,9 +13,17 @@
         @foreach (var ev in Model)
         {
             <div class="col-md-4 mb-4">
-                <div class="card shadow" style="cursor:pointer;" data-toggle="modal" data-target="#eventModal-@ev.Id">
+                <div class="card shadow" data-toggle="modal" data-target="#eventModal-@ev.Id" style="cursor:pointer;">
                     <div class="card-body">
                         <h5 class="card-title">@ev.Name</h5>
+
+                        @if (!string.IsNullOrEmpty(ev.eventPhoto))
+                        {
+                            <div class="text-center mb-3">
+                                <img src="@ev.eventPhoto" class="img-fluid rounded" style="max-height:200px; object-fit:cover;" />
+                            </div>
+                        }
+
                         <p class="card-text">
                             <strong>Start:</strong> @ev.Start.ToDateTime().ToString("yyyy-MM-dd HH:mm")<br />
                             <strong>End:</strong> @(ev.End?.ToDateTime().ToString("yyyy-MM-dd HH:mm") ?? "-")<br />
@@ -23,9 +31,9 @@
                             <strong>Registration Due:</strong> @ev.RegistrationDueDate.ToDateTime().ToString("yyyy-MM-dd")
                         </p>
                         <a class="btn btn-sm btn-secondary"
-                                   href="@Url.Action("DownloadEventQRCode", "Staff", new { eventId = ev.Id })"
-                                   target="_blank">
-                                    Download Attendance QR
+                           href="@Url.Action("DownloadEventQRCode", "Staff", new { eventId = ev.Id })"
+                           target="_blank">
+                            Download Attendance QR
                         </a>
                     </div>
                 </div>
@@ -46,7 +54,7 @@
                                 @if (!string.IsNullOrEmpty(ev.eventPhoto))
                                 {
                                     <div class="text-center mb-3">
-                                        <img src="@ev.eventPhoto" class="img-fluid rounded" style="max-height:200px;" />
+                                        <img src="@ev.eventPhoto" class="img-fluid rounded" style="max-height:200px; object-fit:cover;" />
                                     </div>
                                 }
                             <div class="row">

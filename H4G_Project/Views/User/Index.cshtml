@@ -24,6 +24,38 @@
                     <div class="card-body py-2">
                         <small class="text-muted">Your Engagement Type:</small><br>
                         <span class="badge badge-info">@(Model.EngagementType ?? "Ad hoc engagement")</span>
+                        
+                        @if (ViewBag.EngagementUsage != null)
+                        {
+                            <hr class="my-2">
+                            <small class="text-muted">Weekly Usage:</small><br>
+                            <div class="d-flex justify-content-between align-items-center">
+                                @if (ViewBag.EngagementUsage.Limit == int.MaxValue)
+                                {
+                                    <span class="small">@ViewBag.EngagementUsage.CurrentCount events (Unlimited)</span>
+                                    <span class="badge badge-success badge-sm">Unlimited</span>
+                                }
+                                else
+                                {
+                                    <span class="small">@ViewBag.EngagementUsage.CurrentCount / @ViewBag.EngagementUsage.Limit events</span>
+                                    @if (ViewBag.EngagementUsage.CanRegister)
+                                    {
+                                        <span class="badge badge-success badge-sm">Available</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-warning badge-sm">Limit Reached</span>
+                                    }
+                                }
+                            </div>
+                            @if (ViewBag.EngagementUsage.CurrentCount > 0 && ViewBag.EngagementUsage.Limit != int.MaxValue)
+                            {
+                                <div class="progress mt-1" style="height: 4px;">
+                                    <div class="progress-bar @(ViewBag.EngagementUsage.CanRegister ? "bg-success" : "bg-warning")" 
+                                         style="width: @(((double)ViewBag.EngagementUsage.CurrentCount / ViewBag.EngagementUsage.Limit) * 100)%"></div>
+                                </div>
+                            }
+                        }
                     </div>
                 </div>
             }
@@ -209,10 +241,10 @@
 
                     const participantFields = role === 'Participant' ? `
                         <div class="form-group text-left mt-2">
-                            <label>Phone Number</label>
+                            <label>Phone Number *</label>
                             <input type="tel" id="PhoneNumber" class="form-control" 
-                                   placeholder="12345678" maxlength="8" />
-                            <small class="text-muted">Optional: 8 digits</small>
+                                   placeholder="12345678" maxlength="8" required />
+                            <small class="text-muted">8 digits only</small>
                             <small class="text-danger" id="phoneError" style="display:none;">Please enter exactly 8 digits only</small>
                         </div>
                         <div class="form-group text-left mt-2">
@@ -220,13 +252,14 @@
                             <textarea id="DietaryRequirements" class="form-control" rows="2" placeholder="e.g., Vegetarian, Allergies"></textarea>
                         </div>
                         <div class="form-group text-left mt-2">
-                            <label>Emergency Contact Name</label>
-                            <input type="text" id="EmergencyContactName" class="form-control" placeholder="Full name of emergency contact" />
+                            <label>Emergency Contact Name *</label>
+                            <input type="text" id="EmergencyContactName" class="form-control" placeholder="Full name of emergency contact" required />
+                            <small class="text-danger" id="emergencyContactNameError" style="display:none;">Emergency contact name is required</small>
                         </div>
                         <div class="form-group text-left mt-2">
-                            <label>Emergency Contact Number</label>
+                            <label>Emergency Contact Number *</label>
                             <input type="tel" id="EmergencyContactNumber" class="form-control" 
-                                   placeholder="12345678" maxlength="8" />
+                                   placeholder="12345678" maxlength="8" required />
                             <small class="text-muted">8 digits only</small>
                             <small class="text-danger" id="emergencyContactError" style="display:none;">Please enter exactly 8 digits only</small>
                         </div>
@@ -330,14 +363,18 @@
                                     });
                                 });
                             } else if (role === 'Participant') {
-                                // Add phone validation for participants
+                                // Add phone validation for participants (required)
                                 const phoneInput = document.getElementById('PhoneNumber');
                                 const phoneError = document.getElementById('phoneError');
 
                                 phoneInput.addEventListener('blur', function() {
-                                    // Phone validation: exactly 8 digits (numbers only)
                                     const phoneRegex = /^\d{8}$/;
-                                    if (this.value && !phoneRegex.test(this.value)) {
+                                    if (!this.value.trim()) {
+                                        phoneError.textContent = 'Phone number is required';
+                                        phoneError.style.display = 'block';
+                                        this.classList.add('is-invalid');
+                                    } else if (!phoneRegex.test(this.value)) {
+                                        phoneError.textContent = 'Please enter exactly 8 digits only';
                                         phoneError.style.display = 'block';
                                         this.classList.add('is-invalid');
                                     } else {
@@ -346,13 +383,32 @@
                                     }
                                 });
 
-                                // Add validation for emergency contact number
+                                // Add validation for emergency contact name (required)
+                                const emergencyContactNameInput = document.getElementById('EmergencyContactName');
+                                const emergencyContactNameError = document.getElementById('emergencyContactNameError');
+
+                                emergencyContactNameInput.addEventListener('blur', function() {
+                                    if (!this.value.trim()) {
+                                        emergencyContactNameError.style.display = 'block';
+                                        this.classList.add('is-invalid');
+                                    } else {
+                                        emergencyContactNameError.style.display = 'none';
+                                        this.classList.remove('is-invalid');
+                                    }
+                                });
+
+                                // Add validation for emergency contact number (required)
                                 const emergencyContactInput = document.getElementById('EmergencyContactNumber');
                                 const emergencyContactError = document.getElementById('emergencyContactError');
 
                                 emergencyContactInput.addEventListener('blur', function() {
                                     const phoneRegex = /^\d{8}$/;
-                                    if (this.value && !phoneRegex.test(this.value)) {
+                                    if (!this.value.trim()) {
+                                        emergencyContactError.textContent = 'Emergency contact number is required';
+                                        emergencyContactError.style.display = 'block';
+                                        this.classList.add('is-invalid');
+                                    } else if (!phoneRegex.test(this.value)) {
+                                        emergencyContactError.textContent = 'Please enter exactly 8 digits only';
                                         emergencyContactError.style.display = 'block';
                                         this.classList.add('is-invalid');
                                     } else {
@@ -452,16 +508,35 @@
                                 // Participant validation
                                 const phoneNumber = document.getElementById('PhoneNumber') ? document.getElementById('PhoneNumber').value.trim() : '';
                                 const emergencyContactNumber = document.getElementById('EmergencyContactNumber') ? document.getElementById('EmergencyContactNumber').value.trim() : '';
+                                const emergencyContactName = document.getElementById('EmergencyContactName') ? document.getElementById('EmergencyContactName').value.trim() : '';
                                 
-                                // Validate phone number if provided - exactly 8 digits (numbers only)
+                                // Validate emergency contact name (required for participants)
+                                if (!emergencyContactName) {
+                                    Swal.showValidationMessage('Emergency contact name is required');
+                                    return false;
+                                }
+
+                                // Validate emergency contact number (required for participants)
+                                if (!emergencyContactNumber) {
+                                    Swal.showValidationMessage('Emergency contact number is required');
+                                    return false;
+                                }
+
+                                // Validate phone number (required for participants)
+                                if (!phoneNumber) {
+                                    Swal.showValidationMessage('Phone number is required');
+                                    return false;
+                                }
+
+                                // Validate phone number format - exactly 8 digits (numbers only)
                                 const phoneRegex = /^\d{8}$/;
-                                if (phoneNumber && !phoneRegex.test(phoneNumber)) {
+                                if (!phoneRegex.test(phoneNumber)) {
                                     Swal.showValidationMessage('Please enter a valid phone number (8 digits only)');
                                     return false;
                                 }
 
-                                // Validate emergency contact number if provided - exactly 8 digits (numbers only)
-                                if (emergencyContactNumber && !phoneRegex.test(emergencyContactNumber)) {
+                                // Validate emergency contact number format - exactly 8 digits (numbers only)
+                                if (!phoneRegex.test(emergencyContactNumber)) {
                                     Swal.showValidationMessage('Please enter a valid emergency contact number (8 digits only)');
                                     return false;
                                 }
@@ -507,16 +582,28 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            if (data.requiresPayment) {
-                                // Step 4: Show payment for participants
-                                showPaymentModal(data.registrationId, data.qrCode, data.paymentAmount);
+                            if (data.isWaitlisted) {
+                                // User is waitlisted
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Added to Waitlist',
+                                    html: `
+                                        <p>${data.message}</p>
+                                        <p><strong>Registration ID:</strong> ${data.registrationId}</p>
+                                        <p class="text-info">You will be notified if a spot becomes available.</p>
+                                        <p class="text-muted small">No payment is required while on the waitlist.</p>
+                                    `
+                                });
+                            } else if (data.requiresPayment) {
+                                // Confirmed participant - show payment
+                                showPaymentModal(data.registrationId, data.qrCode, data.paymentAmount, data.message);
                             } else {
-                                // Volunteer - no payment needed
+                                // Volunteer or confirmed participant with no payment
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Registration Successful!',
                                     html: `
-                                        <p>Your registration has been confirmed.</p>
+                                        <p>${data.message}</p>
                                         <p><strong>Registration ID:</strong> ${data.registrationId}</p>
                                         <p><strong>QR Code:</strong> ${data.qrCode}</p>
                                     `
@@ -531,7 +618,7 @@
                     });
                 }
 
-                function showPaymentModal(registrationId, qrCode, amount) {
+                function showPaymentModal(registrationId, qrCode, amount, successMessage = '') {
                     // Step 4: Show mock QR code for payment
                     Swal.fire({
                         title: 'Payment Required',

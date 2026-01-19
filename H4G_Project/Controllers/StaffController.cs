@@ -1,16 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FirebaseAdmin.Auth;
+using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Firestore;
+using Google.Cloud.Storage.V1;
 using H4G_Project.DAL;
 using H4G_Project.Models;
 using H4G_Project.Services;
-using FirebaseAdmin.Auth;
-using Google.Cloud.Firestore;
-using System.Threading.Tasks;
-using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using QRCoder;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace H4G_Project.Controllers
 {
@@ -352,6 +354,9 @@ namespace H4G_Project.Controllers
         }
 
         // Handle create event
+        // ===============================
+        // HANDLE CREATE EVENT WITH PHOTO
+        // ===============================
         [HttpPost]
         public async Task<IActionResult> CreateEvent(
             string Name,
@@ -359,7 +364,8 @@ namespace H4G_Project.Controllers
             DateTime? End,
             string Details,
             DateTime RegistrationDueDate,
-            int MaxParticipants)
+            int MaxParticipants,
+            IFormFile EventPhoto) // Added file parameter
         {
             if (string.IsNullOrEmpty(Name))
             {
@@ -367,54 +373,112 @@ namespace H4G_Project.Controllers
                 return View();
             }
 
-            // Create Event object
+            // 1️⃣ Create Event object WITHOUT photo first
             Event ev = new Event
             {
                 Name = Name,
                 Start = Timestamp.FromDateTime(Start.ToUniversalTime()),
-                End = End.HasValue
-                    ? Timestamp.FromDateTime(End.Value.ToUniversalTime())
-                    : null,
+                End = End.HasValue ? Timestamp.FromDateTime(End.Value.ToUniversalTime()) : null,
                 RegistrationDueDate = Timestamp.FromDateTime(RegistrationDueDate.ToUniversalTime()),
                 MaxParticipants = MaxParticipants,
                 Details = Details
             };
 
-            bool success = await _eventsDAL.AddEvent(ev);
+            // 2️⃣ Save event → get Firestore ID
+            string eventId = await _eventsDAL.AddEventAndReturnId(ev);
 
-            if (success)
+            // 3️⃣ Upload image to Firebase Storage (if exists)
+            if (EventPhoto != null && EventPhoto.Length > 0)
             {
-                TempData["SuccessMessage"] = "Event created successfully!";
-                return RedirectToAction(nameof(CreateEvent));
+                string imageUrl = await UploadEventPhotoToFirebase(eventId, EventPhoto);
+
+                if (!string.IsNullOrEmpty(imageUrl))
+                {
+                    await _eventsDAL.UpdateEventPhoto(eventId, imageUrl);
+                }
             }
 
-            ModelState.AddModelError("", "Failed to create event.");
-            return View();
+            TempData["SuccessMessage"] = "Event created successfully!";
+            return RedirectToAction(nameof(CreateEvent));
         }
+
+        // ===============================
+        // UPLOAD EVENT PHOTO TO FIREBASE STORAGE
+        // ===============================
+        private async Task<string> UploadEventPhotoToFirebase(string eventId, IFormFile file)
+        {
+            string bucketName = "squad-60b0b.firebasestorage.app"; // Firebase bucket
+            string serviceAccountPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "DAL", "config",
+                "squad-60b0b-firebase-adminsdk-fbsvc-582ee8d43f.json"
+            );
+
+            var credential = GoogleCredential.FromFile(serviceAccountPath);
+            var storageClient = await StorageClient.CreateAsync(credential);
+
+            string fileName = $"eventPhotos/{eventId}{Path.GetExtension(file.FileName)}";
+
+            using var stream = file.OpenReadStream();
+
+            // Generate a GUID token
+            string downloadToken = Guid.NewGuid().ToString();
+
+            // Upload object with metadata for Firebase-style download token
+            var obj = await storageClient.UploadObjectAsync(new Google.Apis.Storage.v1.Data.Object
+            {
+                Bucket = bucketName,
+                Name = fileName,
+                ContentType = file.ContentType,
+                Metadata = new System.Collections.Generic.Dictionary<string, string>
+        {
+            { "firebaseStorageDownloadTokens", downloadToken }
+        }
+            }, stream);
+
+            // Construct the Firebase Storage download URL
+            string url = $"https://firebasestorage.googleapis.com/v0/b/{bucketName}/o/{Uri.EscapeDataString(fileName)}?alt=media&token={downloadToken}";
+
+            return url;
+        }
+
 
 
         // =============================== // VIEW ALL EVENTS // =============================== //
         [HttpGet]
         public async Task<IActionResult> ViewAllEvents()
         {
+            // 1️⃣ Retrieve all events
             var events = await _eventsDAL.GetAllEvents();
 
+            // 2️⃣ Sort by start date
             var sortedEvents = events
                 .OrderBy(e => e.Start.ToDateTime())
                 .ToList();
 
+            // 3️⃣ Retrieve comments for each event
             var eventComments = new Dictionary<string, List<CommentVM>>();
-
             foreach (var ev in sortedEvents)
             {
-                var comments = await _eventsDAL.GetCommentTree(ev.Id); // same as user
+                var comments = await _eventsDAL.GetCommentTree(ev.Id); // get threaded comments
                 eventComments[ev.Id] = comments;
             }
 
             ViewBag.EventComments = eventComments;
 
+            // 4️⃣ Ensure every event has a photo URL (optional safety check)
+            foreach (var ev in sortedEvents)
+            {
+                if (string.IsNullOrEmpty(ev.eventPhoto))
+                {
+                    // Set a default image if none exists
+                    ev.eventPhoto = "/images/default-event.png";
+                }
+            }
+
             return View(sortedEvents);
         }
+
 
 
         // Add comment or reply
@@ -530,7 +594,16 @@ namespace H4G_Project.Controllers
             return View(participants);
         }
 
-        /* [HttpPost]
+        [HttpGet]
+        public IActionResult UpdateEngagement()
+        {
+            // Redirect to ManageEngagement page if accessed directly
+            TempData["InfoMessage"] = "Please use the 'Update Engagement' button next to each participant to modify their engagement type.";
+            return RedirectToAction("ManageEngagement");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateEngagement(string email, string engagementType)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(engagementType))
@@ -558,6 +631,6 @@ namespace H4G_Project.Controllers
             }
 
             return RedirectToAction("ManageEngagement");
-        } */
+        }
     }
 }

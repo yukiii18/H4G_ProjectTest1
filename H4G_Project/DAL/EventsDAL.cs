@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using H4G_Project.Models;
 
@@ -69,7 +70,7 @@ namespace H4G_Project.DAL
             return events;
         }
 
-        public async Task<List<Event>> GetEventsByUserEmail()
+        /*public async Task<List<Event>> GetEventsByUserEmail()
         {
             CollectionReference eventsRef = db.Collection("events");
             QuerySnapshot snapshot = await eventsRef.GetSnapshotAsync();
@@ -87,7 +88,7 @@ namespace H4G_Project.DAL
             }
 
             return events;
-        }
+        }*/
 
         public async Task<List<Event>> GetEventsByUserEmail(string userEmail)
         {
@@ -331,6 +332,143 @@ namespace H4G_Project.DAL
             }
         }
 
+        // 🔹 Get user's confirmed registrations for current week (based on event dates, not registration dates)
+        public async Task<int> GetUserWeeklyRegistrationCount(string userEmail)
+        {
+            try
+            {
+                // Get start and end of current week (Monday to Sunday)
+                DateTime today = DateTime.Now;
+                int daysFromMonday = ((int)today.DayOfWeek - 1 + 7) % 7;
+                DateTime weekStart = today.AddDays(-daysFromMonday).Date;
+                DateTime weekEnd = weekStart.AddDays(7).Date;
+
+                // Get all user's confirmed registrations
+                QuerySnapshot snapshot = await db.Collection("eventRegistrations")
+                    .WhereEqualTo("email", userEmail)
+                    .WhereEqualTo("role", "Participant")
+                    .WhereIn("waitlistStatus", new[] { "Confirmed" })
+                    .GetSnapshotAsync();
+
+                // Get all events to check their dates
+                var allEvents = await GetAllEvents();
+                var eventDict = allEvents.ToDictionary(e => e.Id, e => e);
+
+                int weeklyEventCount = 0;
+
+                foreach (DocumentSnapshot doc in snapshot.Documents)
+                {
+                    if (doc.Exists)
+                    {
+                        var registration = doc.ConvertTo<EventRegistration>();
+                        
+                        // Check if the event for this registration occurs in the current week
+                        if (eventDict.ContainsKey(registration.EventId))
+                        {
+                            var eventObj = eventDict[registration.EventId];
+                            DateTime eventDate = eventObj.Start.ToDateTime().Date;
+                            
+                            // Check if event date falls within current week
+                            if (eventDate >= weekStart && eventDate < weekEnd)
+                            {
+                                weeklyEventCount++;
+                            }
+                        }
+                    }
+                }
+
+                return weeklyEventCount;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting weekly registration count: {ex.Message}");
+                return 0;
+            }
+        }
+
+        // 🔹 Get engagement limit based on engagement type
+        public static int GetEngagementWeeklyLimit(string engagementType)
+        {
+            return engagementType switch
+            {
+                "Ad hoc engagement" => 1,
+                "Once a week engagement" => 1,
+                "Twice a week engagement" => 2,
+                "3 or more times a week engagement" => int.MaxValue, // No limit
+                _ => 1 // Default to 1 for unknown types
+            };
+        }
+
+        // 🔹 Check if user can register for more events this week (including the event they're trying to register for)
+        public async Task<(bool canRegister, int currentCount, int limit, string message)> CheckUserEngagementLimit(string userEmail, string engagementType, string eventIdToRegister = null)
+        {
+            try
+            {
+                int currentCount = await GetUserWeeklyRegistrationCount(userEmail);
+                
+                // If we're checking for a specific event registration, we need to see if this would exceed the limit
+                int projectedCount = currentCount;
+                if (!string.IsNullOrEmpty(eventIdToRegister))
+                {
+                    // Check if the event they're trying to register for is in the current week
+                    var allEvents = await GetAllEvents();
+                    var eventToRegister = allEvents.FirstOrDefault(e => e.Id == eventIdToRegister);
+                    
+                    if (eventToRegister != null)
+                    {
+                        DateTime today = DateTime.Now;
+                        int daysFromMonday = ((int)today.DayOfWeek - 1 + 7) % 7;
+                        DateTime weekStart = today.AddDays(-daysFromMonday).Date;
+                        DateTime weekEnd = weekStart.AddDays(7).Date;
+                        
+                        DateTime eventDate = eventToRegister.Start.ToDateTime().Date;
+                        
+                        // If the event is in the current week, add 1 to the projected count
+                        if (eventDate >= weekStart && eventDate < weekEnd)
+                        {
+                            projectedCount = currentCount + 1;
+                        }
+                    }
+                }
+
+                int limit = GetEngagementWeeklyLimit(engagementType);
+                bool canRegister = projectedCount <= limit;
+                
+                string message;
+                if (limit == int.MaxValue)
+                {
+                    // Unlimited engagement
+                    message = $"You have unlimited event access. Current registrations this week: {currentCount}.";
+                    canRegister = true; // Always allow registration for unlimited users
+                }
+                else
+                {
+                    // Limited engagement
+                    if (!string.IsNullOrEmpty(eventIdToRegister))
+                    {
+                        // Checking for a specific registration
+                        message = canRegister 
+                            ? $"You have used {currentCount} of {limit} events this week. This registration would bring you to {projectedCount}."
+                            : $"You have reached your weekly limit of {limit} events. Current registrations: {currentCount}. This registration would exceed your limit.";
+                    }
+                    else
+                    {
+                        // General check
+                        message = canRegister 
+                            ? $"You have used {currentCount} of {limit} events this week."
+                            : $"You have reached your weekly limit of {limit} events. Current registrations: {currentCount}.";
+                    }
+                }
+
+                return (canRegister, currentCount, limit, message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error checking engagement limit: {ex.Message}");
+                return (false, 0, 1, "Error checking engagement limit.");
+            }
+        }
+
         // 🔹 Count confirmed registrations for an event
         public async Task<int> CountConfirmedRegistrations(string eventId)
         {
@@ -528,8 +666,176 @@ namespace H4G_Project.DAL
             return roots;
         }
 
+        // 🔹 Get volunteer registrations only (for staff approval)
+        public async Task<List<EventRegistration>> GetVolunteerRegistrations()
+        {
+            CollectionReference regRef = db.Collection("eventRegistrations");
+            QuerySnapshot snapshot = await regRef.WhereEqualTo("role", "Volunteer").GetSnapshotAsync();
+
+            List<EventRegistration> volunteerRegistrations = new();
+
+            foreach (DocumentSnapshot doc in snapshot.Documents)
+            {
+                if (doc.Exists)
+                {
+                    EventRegistration reg = doc.ConvertTo<EventRegistration>();
+                    reg.Id = doc.Id;
+                    volunteerRegistrations.Add(reg);
+                }
+            }
+
+            return volunteerRegistrations;
+        }
+
+        // 🔹 Promote waitlisted participants when spots become available
+        public async Task<bool> PromoteFromWaitlist(string eventId)
+        {
+            try
+            {
+                // Get event details to check max capacity
+                var events = await GetAllEvents();
+                var eventDetails = events.FirstOrDefault(e => e.Id == eventId);
+                if (eventDetails == null) return false;
+
+                // Get all registrations for this event
+                var allRegistrations = await GetAllRegistrations();
+                var eventRegistrations = allRegistrations.Where(r => r.EventId == eventId).ToList();
+
+                // Count current confirmed participants (excluding volunteers)
+                int confirmedParticipants = eventRegistrations.Count(r => 
+                    r.WaitlistStatus == "Confirmed" && r.Role == "Participant");
+
+                // Get waitlisted participants ordered by registration date (first come, first served)
+                var waitlistedParticipants = eventRegistrations
+                    .Where(r => r.WaitlistStatus == "Waitlisted" && r.Role == "Participant")
+                    .OrderBy(r => r.RegistrationDate.ToDateTime())
+                    .ToList();
+
+                // Promote participants from waitlist if there are available spots
+                int availableSpots = eventDetails.MaxParticipants - confirmedParticipants;
+                int promoted = 0;
+
+                foreach (var waitlistedParticipant in waitlistedParticipants.Take(availableSpots))
+                {
+                    // Update status to confirmed
+                    await UpdateWaitlistStatus(waitlistedParticipant.Id, "Confirmed");
+                    
+                    // Update payment status and amount
+                    await UpdateRegistrationPaymentInfo(waitlistedParticipant.Id, "Pending", 50.0);
+                    
+                    promoted++;
+                }
+
+                return promoted > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error promoting from waitlist: {ex.Message}");
+                return false;
+            }
+        }
+
+        // 🔹 Update waitlist status
+        public async Task<bool> UpdateWaitlistStatus(string registrationId, string status)
+        {
+            try
+            {
+                DocumentReference docRef = db.Collection("eventRegistrations").Document(registrationId);
+                await docRef.UpdateAsync("waitlistStatus", status);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating waitlist status: {ex.Message}");
+                return false;
+            }
+        }
+
+        // 🔹 Update registration payment information
+        public async Task<bool> UpdateRegistrationPaymentInfo(string registrationId, string paymentStatus, double paymentAmount)
+        {
+            try
+            {
+                DocumentReference docRef = db.Collection("eventRegistrations").Document(registrationId);
+                
+                Dictionary<string, object> updates = new Dictionary<string, object>
+                {
+                    { "paymentStatus", paymentStatus },
+                    { "paymentAmount", paymentAmount }
+                };
+
+                await docRef.UpdateAsync(updates);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating payment info: {ex.Message}");
+                return false;
+            }
+        }
+
+        // 🔹 Update volunteer registration status (legacy method for backward compatibility)
+        public async Task<bool> UpdateVolunteerRegistrationStatus(string registrationId, string status)
+        {
+            try
+            {
+                DocumentReference docRef = db.Collection("eventRegistrations").Document(registrationId);
+
+                Dictionary<string, object> updates = new Dictionary<string, object>
+                {
+                    { "status", status }
+                };
+
+                await docRef.UpdateAsync(updates);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating volunteer registration status: {ex.Message}");
+                return false;
+            }
+        }
+
+        // 🔹 Cancel registration and promote from waitlist
+        public async Task<bool> CancelRegistration(string registrationId)
+        {
+            try
+            {
+                // Get the registration to cancel
+                var registration = await GetRegistrationById(registrationId);
+                if (registration == null) return false;
+
+                // Update status to cancelled
+                await UpdateWaitlistStatus(registrationId, "Cancelled");
+
+                // If this was a confirmed participant, promote someone from waitlist
+                if (registration.WaitlistStatus == "Confirmed" && registration.Role == "Participant")
+                {
+                    await PromoteFromWaitlist(registration.EventId);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error cancelling registration: {ex.Message}");
+                return false;
+            }
+        }
 
 
+        public async Task<string> AddEventAndReturnId(Event ev)
+        {
+            DocumentReference docRef = await db.Collection("events").AddAsync(ev);
+            return docRef.Id;
+        }
+
+        public async Task UpdateEventPhoto(string eventId, string imageUrl)
+        {
+            await db.Collection("events")
+                    .Document(eventId)
+                    .UpdateAsync("eventPhoto", imageUrl);
+        }
 
     }
 }

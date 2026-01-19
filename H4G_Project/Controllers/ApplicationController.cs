@@ -19,6 +19,7 @@ namespace H4G_Project.Controllers
     public class ApplicationController : Controller
     {
         ApplicationDAL applicationContext = new ApplicationDAL();
+        EventsDAL eventsContext = new EventsDAL();
         private readonly IConfiguration _config;
         private readonly NotificationService _notificationService;
 
@@ -36,19 +37,32 @@ namespace H4G_Project.Controllers
             return Ok("Notification sent");
         }
 
-
-        // Show list of applications
+        // Show list of applications with tabs for client applications and volunteer registrations
         public async Task<ActionResult> Index()
         {
             var applications = await applicationContext.GetAllApplications();
 
             // Sort applications: Pending first, then Declined, then Approved at bottom
-            // Note: Applications remain "Pending" until user account is actually created
             var sortedApplications = applications
-                .OrderBy(a => a.Status == "Approved" ? 2 : (a.Status == "Declined" ? 1 : 0))
+                .OrderBy(a => a.Status == "Pending" ? 0 : (a.Status == "Declined" ? 1 : 2))
                 .ToList();
 
             return View(sortedApplications);
+        }
+
+        // Show volunteer registrations page
+        public async Task<ActionResult> VolunteerRegistrations()
+        {
+            var volunteerRegistrations = await eventsContext.GetVolunteerRegistrations();
+            var allEvents = await eventsContext.GetAllEvents();
+
+            // Sort volunteer registrations: Pending first, then Declined, then Approved at bottom
+            var sortedVolunteerRegistrations = volunteerRegistrations
+                .OrderBy(v => v.Status == "Pending" ? 0 : (v.Status == "Declined" ? 1 : 2))
+                .ToList();
+
+            ViewBag.AllEvents = allEvents;
+            return View(sortedVolunteerRegistrations);
         }
 
         // Show the form (GET)
@@ -125,7 +139,7 @@ namespace H4G_Project.Controllers
 
                 if (success)
                 {
-                    var smtpClient = new SmtpClient("smtp.gmail.com")
+                                        var smtpClient = new SmtpClient("smtp.gmail.com")
                     {
                         Port = 587,
                         Credentials = new NetworkCredential(
@@ -147,7 +161,7 @@ namespace H4G_Project.Controllers
 
                     await smtpClient.SendMailAsync(mailMessage);
 
-                    TempData["SuccessMessage"] = $"Application for {applicantName} declined and email sent via Gmail.";
+                    TempData["SuccessMessage"] = $"Application for {applicantName} declined successfully.";
                 }
                 else
                 {
@@ -160,6 +174,60 @@ namespace H4G_Project.Controllers
             {
                 TempData["ErrorMessage"] = $"Error declining application: {ex.Message}";
                 return RedirectToAction("Index");
+            }
+        }
+
+        // Approve volunteer registration
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveVolunteerRegistration(string registrationId, string volunteerName, string volunteerEmail)
+        {
+            try
+            {
+                bool success = await eventsContext.UpdateVolunteerRegistrationStatus(registrationId, "Approved");
+
+                if (success)
+                {
+                    TempData["SuccessMessage"] = $"Volunteer registration for {volunteerName} approved successfully.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to approve volunteer registration.";
+                }
+
+                return RedirectToAction("VolunteerRegistrations");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error approving volunteer registration: {ex.Message}";
+                return RedirectToAction("VolunteerRegistrations");
+            }
+        }
+
+        // Reject volunteer registration
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectVolunteerRegistration(string registrationId, string volunteerName, string volunteerEmail)
+        {
+            try
+            {
+                bool success = await eventsContext.UpdateVolunteerRegistrationStatus(registrationId, "Declined");
+
+                if (success)
+                {
+                    TempData["SuccessMessage"] = $"Volunteer registration for {volunteerName} declined successfully.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to decline volunteer registration.";
+                }
+
+                return RedirectToAction("VolunteerRegistrations");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error declining volunteer registration: {ex.Message}";
+                return RedirectToAction("VolunteerRegistrations");
             }
         }
     }

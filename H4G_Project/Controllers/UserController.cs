@@ -82,6 +82,19 @@ namespace H4G_Project.Controllers
             User user = await _userContext.GetUserByEmail(email);
             ViewBag.UserRole = HttpContext.Session.GetString("UserRole") ?? "Participant";
 
+            // Get engagement usage information for participants
+            if (user != null && user.Role == "Participant")
+            {
+                var (canRegister, currentCount, limit, message) = await _eventsDAL.CheckUserEngagementLimit(email, user.EngagementType, null);
+                ViewBag.EngagementUsage = new
+                {
+                    CurrentCount = currentCount,
+                    Limit = limit,
+                    CanRegister = canRegister,
+                    Message = message
+                };
+            }
+
             return View(user);
         }
 
@@ -237,10 +250,25 @@ namespace H4G_Project.Controllers
             if (string.IsNullOrEmpty(userEmail))
                 return RedirectToAction("Index", "Home");
 
+            // 1️⃣ Get all events for the user
             var events = await _eventsDAL.GetEventsByUserEmail(userEmail);
 
-            var eventComments = new Dictionary<string, List<CommentVM>>();
+            // 2️⃣ Ensure each event has a proper Firebase Storage URL
+            foreach (var ev in events)
+            {
+                if (!string.IsNullOrEmpty(ev.eventPhoto))
+                {
+                    // If your DAL only stores the path like "eventPhotos/abc.png",
+                    // construct the full downloadable URL with token
+                    if (!ev.eventPhoto.StartsWith("https://"))
+                    {
+                        ev.eventPhoto = $"https://firebasestorage.googleapis.com/v0/b/squad-60b0b.appspot.com/o/{Uri.EscapeDataString(ev.eventPhoto)}?alt=media";
+                    }
+                }
+            }
 
+            // 3️⃣ Load comments
+            var eventComments = new Dictionary<string, List<CommentVM>>();
             foreach (var ev in events)
             {
                 var comments = await _eventsDAL.GetCommentTree(ev.Id);

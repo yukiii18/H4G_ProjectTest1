@@ -87,5 +87,9 @@ namespace H4G_Project.Models
         [FirestoreProperty("attendance")]
         public bool Attendance { get; set; } = false;
 
+        // Status field for volunteer registration approval workflow
+        [FirestoreProperty("status")]
+        public string Status { get; set; } = "Pending"; // "Pending", "Approved", "Declined"
+
     }
 }

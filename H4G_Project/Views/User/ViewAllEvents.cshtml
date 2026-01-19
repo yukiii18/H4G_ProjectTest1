@@ -4,6 +4,7 @@
 @{
     ViewData["Title"] = "My Events";
     Layout = "~/Views/Shared/_Member.cshtml";
+    var eventComments = ViewBag.EventComments as Dictionary<string, List<H4G_Project.Models.CommentVM>> ?? new Dictionary<string, List<H4G_Project.Models.CommentVM>>();
 }
 
 <div class="container mt-4">
@@ -14,6 +15,15 @@
                 <div class="card shadow" data-toggle="modal" data-target="#eventModal-@ev.Id" style="cursor:pointer;">
                     <div class="card-body">
                         <h5 class="card-title">@ev.Name</h5>
+
+                        @* Display event photo if exists *@
+                        @if (!string.IsNullOrEmpty(ev.eventPhoto))
+                        {
+                            <div class="text-center mb-3">
+                                <img src="@ev.eventPhoto" class="img-fluid rounded" style="max-height:200px; object-fit:cover;" />
+                            </div>
+                        }
+
                         <p class="card-text">
                             <strong>Start:</strong> @ev.Start.ToDateTime().ToString("yyyy-MM-dd HH:mm") <br />
                             <strong>End:</strong> @(ev.End?.ToDateTime().ToString("yyyy-MM-dd HH:mm") ?? "-") <br />
@@ -36,7 +46,6 @@
                         <div class="modal-body">
                             <!-- Event Details -->
                             <div class="event-details mb-4">
-                                <h6 class="text-primary mb-3">Event Details</h6>
                                 @if (!string.IsNullOrEmpty(ev.eventPhoto))
                                 {
                                     <div class="text-center mb-3">
@@ -64,8 +73,7 @@
                                 <h6 class="text-primary mb-3">Comments & Discussion</h6>
 
                                 @{
-                                    var eventComments = ViewBag.EventComments as Dictionary<string, List<H4G_Project.Models.CommentVM>>;
-                                    var comments = eventComments?.ContainsKey(ev.Id) == true ? eventComments[ev.Id] : new List<H4G_Project.Models.CommentVM>();
+                                    var comments = eventComments.ContainsKey(ev.Id) ? eventComments[ev.Id] : new List<H4G_Project.Models.CommentVM>();
 
                                     IHtmlContent RenderComment(H4G_Project.Models.CommentVM c, int depth)
                                     {
@@ -93,7 +101,8 @@
                                                         </div>
                                                         </form>
 
-                                                        <div id='thread-{c.Id}' class='replies-container'>";
+                                                        <div id='thread-{c.Id}' class='replies-container'>
+                                                        ";
 
                                         var builder = new HtmlContentBuilder();
                                         builder.AppendHtml(html);

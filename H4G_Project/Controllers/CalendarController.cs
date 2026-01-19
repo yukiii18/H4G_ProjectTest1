@@ -63,21 +63,100 @@ namespace H4G_Project.Controllers
                     return Json(new { success = false, message = "Event not found" });
                 }
 
-                // Count confirmed participants for this event
-                var allRegs = await eventsDAL.GetAllRegistrations();
-                int confirmedCount = allRegs.Count(r => r.EventId == request.EventId && r.WaitlistStatus == "Confirmed");
-                // Determine waitlist status
+                // Check if registration is still open
+                if (eventDetails.RegistrationDueDate.ToDateTime() < DateTime.UtcNow)
+                {
+                    return Json(new { success = false, message = "Registration for this event has closed" });
+                }
+
+                // Check if user is already registered for this event (check this first before engagement limits)
+                var existingRegistrations = await eventsDAL.GetAllRegistrations();
+                var existingRegistration = existingRegistrations.FirstOrDefault(r => 
+                    r.EventId == request.EventId && 
+                    r.Email == request.Email && 
+                    r.WaitlistStatus != "Cancelled");
+
+                if (existingRegistration != null)
+                {
+                    return Json(new { success = false, message = "You are already registered for this event" });
+                }
+
+                // For participants, check engagement limits and validate required fields
+                if (request.Role == "Participant")
+                {
+                    // Validate mandatory phone number for participants
+                    if (string.IsNullOrWhiteSpace(request.PhoneNumber))
+                    {
+                        return Json(new { success = false, message = "Phone number is required for participants" });
+                    }
+
+                    // Validate phone number format (8 digits)
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(request.PhoneNumber, @"^\d{8}$"))
+                    {
+                        return Json(new { success = false, message = "Phone number must be exactly 8 digits" });
+                    }
+
+                    // Validate mandatory emergency contact fields for participants
+                    if (string.IsNullOrWhiteSpace(request.EmergencyContactName))
+                    {
+                        return Json(new { success = false, message = "Emergency contact name is required for participants" });
+                    }
+
+                    if (string.IsNullOrWhiteSpace(request.EmergencyContact))
+                    {
+                        return Json(new { success = false, message = "Emergency contact number is required for participants" });
+                    }
+
+                    // Validate emergency contact number format (8 digits)
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(request.EmergencyContact, @"^\d{8}$"))
+                    {
+                        return Json(new { success = false, message = "Emergency contact number must be exactly 8 digits" });
+                    }
+
+                    var userDAL = new UserDAL();
+                    var user = await userDAL.GetUserByEmail(request.Email);
+                    
+                    if (user != null)
+                    {
+                        var (canRegister, currentCount, limit, message) = await eventsDAL.CheckUserEngagementLimit(request.Email, user.EngagementType, request.EventId);
+                        
+                        if (!canRegister)
+                        {
+                            return Json(new { success = false, message = message });
+                        }
+                    }
+                }
+
+                // Count current confirmed participants for this event (excluding volunteers from participant count)
+                int confirmedParticipantCount = existingRegistrations.Count(r => 
+                    r.EventId == request.EventId && 
+                    r.WaitlistStatus == "Confirmed" && 
+                    r.Role == "Participant");
+
+                // Determine waitlist status based on event capacity
                 string waitlistStatus;
+                string statusMessage;
+
                 if (request.Role == "Volunteer")
                 {
-                    // Volunteers always confirmed
+                    // Volunteers are always confirmed and don't count toward participant limit
                     waitlistStatus = "Confirmed";
+                    statusMessage = "Registration confirmed! Thank you for volunteering.";
                 }
                 else
                 {
-                    waitlistStatus = confirmedCount < eventDetails.MaxParticipants ? "Confirmed" : "Waitlisted";
+                    // Participants: check capacity (first come, first served)
+                    if (confirmedParticipantCount < eventDetails.MaxParticipants)
+                    {
+                        waitlistStatus = "Confirmed";
+                        statusMessage = $"Registration confirmed! You have secured spot {confirmedParticipantCount + 1} of {eventDetails.MaxParticipants}.";
+                    }
+                    else
+                    {
+                        waitlistStatus = "Waitlisted";
+                        statusMessage = $"Event is full ({eventDetails.MaxParticipants} participants). You have been added to the waitlist.";
+                    }
                 }
-
 
                 // Create registration object
                 EventRegistration registration = new EventRegistration
@@ -99,8 +178,8 @@ namespace H4G_Project.Controllers
                     DietaryRequirements = request.DietaryRequirements,
                     EmergencyContact = request.EmergencyContact,
                     EmergencyContactName = request.EmergencyContactName,
-                    PaymentStatus = "Pending",
-                    PaymentAmount = request.Role == "Volunteer" ? 0.0 : 50.0,
+                    PaymentStatus = waitlistStatus == "Confirmed" ? "Pending" : "Not Required", // Waitlisted users don't need to pay yet
+                    PaymentAmount = request.Role == "Volunteer" ? 0.0 : (waitlistStatus == "Confirmed" ? 50.0 : 0.0),
                     RegistrationDate = Timestamp.FromDateTime(DateTime.UtcNow),
                     WaitlistStatus = waitlistStatus
                 };
@@ -117,7 +196,7 @@ namespace H4G_Project.Controllers
                     return Json(new { success = false, message = "Failed to create registration" });
                 }
 
-                // If volunteer, auto-confirm (no payment needed)
+                // Auto-confirm volunteers (no payment needed)
                 if (request.Role == "Volunteer")
                 {
                     await eventsDAL.UpdatePaymentStatus(registrationId, "Completed", mockQrCode);
@@ -126,12 +205,13 @@ namespace H4G_Project.Controllers
                 return Json(new
                 {
                     success = true,
-                    message = "Registration created successfully",
+                    message = statusMessage,
                     registrationId = registrationId,
                     qrCode = mockQrCode,
                     paymentAmount = registration.PaymentAmount,
-                    requiresPayment = request.Role == "Participant",
-                    waitlistStatus = waitlistStatus
+                    requiresPayment = request.Role == "Participant" && waitlistStatus == "Confirmed",
+                    waitlistStatus = waitlistStatus,
+                    isWaitlisted = waitlistStatus == "Waitlisted"
                 });
             }
             catch (Exception ex)
