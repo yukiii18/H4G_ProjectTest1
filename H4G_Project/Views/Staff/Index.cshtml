@@ -83,7 +83,6 @@
                     meridiem: 'short' 
                 },
 
-
                 dateClick: function (info) {
                     Swal.fire({
                         title: 'Date selected',
@@ -93,15 +92,58 @@
                 },
 
                 eventClick: function (info) {
-                    Swal.fire({
-                        title: info.event.title,
-                        text: 'Event clicked',
-                        icon: 'success'
-                    });
+                    const eventId = info.event.id;
+                    const eventTitle = info.event.title;
+                    const eventDate = info.event.startStr;
+
+                    // Show event details for staff (no registration needed)
+                    showEventDetails(eventId, eventTitle, eventDate);
                 }
             });
 
             calendar.render();
+
+            // Helper function to show event details for staff
+            async function showEventDetails(eventId, eventTitle, eventDate) {
+                try {
+                    // Fetch full event details from server
+                    const response = await fetch(`/Calendar/GetEventDetails?id=${eventId}`);
+                    const eventDetails = await response.json();
+
+                    const eventImage = eventDetails.eventPhoto && eventDetails.eventPhoto.trim() !== '' 
+                        ? `<img src="${eventDetails.eventPhoto}" alt="${eventDetails.name}" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;" />`
+                        : '';
+
+                    const eventEndTime = eventDetails.end 
+                        ? `<p><strong>End:</strong> ${eventDetails.end}</p>`
+                        : '';
+
+                    Swal.fire({
+                        title: eventDetails.name,
+                        html: `
+                            <div style="text-align: left; max-height: 60vh; overflow-y: auto; padding: 10px;">
+                                ${eventImage}
+                                <p><strong>Start:</strong> ${eventDetails.start}</p>
+                                ${eventEndTime}
+                                <div style="margin: 15px 0;">
+                                    <strong>Details:</strong>
+                                    <p style="margin-top: 8px; line-height: 1.5; color: #666;">
+                                        ${eventDetails.details || 'No additional details available.'}
+                                    </p>
+                                </div>
+                            </div>
+                        `,
+                        width: '600px',
+                        confirmButtonText: 'Close',
+                        confirmButtonColor: '#6c757d',
+                        focusConfirm: false,
+                        allowOutsideClick: true
+                    });
+                } catch (error) {
+                    console.error('Error fetching event details:', error);
+                    Swal.fire('Error', 'Could not load event details', 'error');
+                }
+            }
         });
     </script>
 
