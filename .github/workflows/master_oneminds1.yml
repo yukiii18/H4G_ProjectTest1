@@ -21,7 +21,7 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '6.0'
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
@@ -52,4 +52,5 @@ jobs:
           app-name: 'OneMINDS1'
           slot-name: 'Production'
           package: .
+
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_346524FE6958408881F55BD3D560C4B9 }}
