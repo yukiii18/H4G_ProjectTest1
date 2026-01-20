@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 
-namespace H4G_Project.NotificationHub
+namespace H4G_Project
 {
     public class NotificationHub : Hub
     {
