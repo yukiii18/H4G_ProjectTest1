@@ -14,7 +14,6 @@
     <PackageReference Include="Google.Cloud.Storage.V1" Version="4.13.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
     <PackageReference Include="QRCoder" Version="1.7.0" />
-    <PackageReference Include="agora_rtc_sdk" Version="4.2.1" />
   </ItemGroup>
 
   <ItemGroup>
