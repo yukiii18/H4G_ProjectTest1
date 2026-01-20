@@ -1,6 +1,5 @@
 # GitHub Actions workflow to build and deploy ASP.NET Core app to Azure Web App'
 
-
 name: Build and deploy ASP.Net Core app to Azure Web App
 
 env:
