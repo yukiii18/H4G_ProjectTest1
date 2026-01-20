@@ -2,21 +2,28 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using H4G_Project.DAL;
 using H4G_Project.Services;
-using H4G_Project;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Firebase initialization for auth
+// ================================
+// Firebase initialization (SECURE)
+// ================================
 if (FirebaseApp.DefaultInstance == null)
 {
+    var firebaseJson = Environment.GetEnvironmentVariable("FIREBASE_SERVICE_ACCOUNT_JSON");
+
+    if (string.IsNullOrWhiteSpace(firebaseJson))
+    {
+        throw new Exception("FIREBASE_SERVICE_ACCOUNT_JSON environment variable is not set.");
+    }
+
     FirebaseApp.Create(new AppOptions
     {
-        Credential = GoogleCredential.FromFile(
-            Path.Combine(Directory.GetCurrentDirectory(), "DAL", "squad-60b0b-firebase-adminsdk-fbsvc-cff3f594d5.json")
-        )
+        Credential = GoogleCredential.FromJson(firebaseJson)
     });
 }
 
+// Services
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<EmailService>();
 
@@ -31,16 +38,12 @@ builder.Services.AddSession(options =>
 // MVC
 builder.Services.AddControllersWithViews();
 
-// DAL services
 builder.Services.AddScoped<UserDAL>();
 builder.Services.AddScoped<StaffDAL>();
 
-// ✅ Add SignalR service
-builder.Services.AddSignalR();
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+// HTTP pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -54,13 +57,8 @@ app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
 
-// ✅ Map SignalR hub(s)
-app.MapHub<NotificationHub>("/notificationHub"); // replace with your hub class + route
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Configure for Render/Azure deployment
-var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
-app.Run($"http://0.0.0.0:{port}");
+app.Run();
