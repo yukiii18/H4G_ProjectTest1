@@ -26,9 +26,4 @@
     <Folder Include="wwwroot\images\EventImg\" />
     <Folder Include="wwwroot\lib\microsoft\" />
   </ItemGroup>
-
-<ItemGroup>
-  <Content Include="DAL\squad-60b0b-firebase-adminsdk-fbsvc-cff3f594d5.json" CopyToOutputDirectory="Always" />
-</ItemGroup>
-
 </Project>
