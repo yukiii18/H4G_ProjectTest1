@@ -7,6 +7,12 @@
     <UserSecretsId>f50d0b7e-ee05-456f-9ba2-397fa645422b</UserSecretsId>
   </PropertyGroup>
 
+<PropertyGroup>
+  <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
+  <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+  <AspNetCoreEnableOutOfProcessLogging>true</AspNetCoreEnableOutOfProcessLogging>
+</PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="FirebaseAdmin" Version="3.4.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.73.0" />
