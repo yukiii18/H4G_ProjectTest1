@@ -3,7 +3,6 @@ using Google.Apis.Auth.OAuth2;
 using H4G_Project.DAL;
 using H4G_Project.Services;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Firebase initialization for auth
@@ -31,9 +30,12 @@ builder.Services.AddSession(options =>
 // MVC
 builder.Services.AddControllersWithViews();
 
+// DAL services
 builder.Services.AddScoped<UserDAL>();
 builder.Services.AddScoped<StaffDAL>();
 
+// ✅ Add SignalR service
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -51,10 +53,13 @@ app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
 
+// ✅ Map SignalR hub(s)
+app.MapHub<NotificationHub>("/notificationHub"); // replace with your hub class + route
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Configure for Render deployment
+// Configure for Render/Azure deployment
 var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
 app.Run($"http://0.0.0.0:{port}");
