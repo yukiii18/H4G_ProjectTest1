@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SignalR Test</title>
+    <!-- Load SignalR client library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+</head>
+<body>
+    <h2>SignalR NotificationHub Test</h2>
+    <div id="messages"></div>
+
+    <script>
+        // Connect to your hub route
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notificationHub")
+            .build();
+
+        // Listen for messages from the server
+        connection.on("ReceiveMessage", (user, message) => {
+            const msgDiv = document.getElementById("messages");
+            msgDiv.innerHTML += `<p><strong>${user}:</strong> ${message}</p>`;
+        });
+
+        // Start the connection
+        connection.start()
+            .then(() => {
+                console.log("Connected to hub!");
+                // Send a test message
+                connection.invoke("SendMessage", "ClientUser", "Hello from the browser!");
+            })
+            .catch(err => console.error(err));
+    </script>
+</body>
+</html>
